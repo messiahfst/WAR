@@ -174,22 +174,54 @@ Bitte teste Folgendes und gib Feedback:
 
 ---
 
-## 🔄 Nächste Implementierungs-Phase (Nach Session 2)
+## ✅ Session 2.1 - INSTANT Effect Animations (Option 2) - COMPLETED
 
-**Nach deinem Testing (10-20 Spiele) können wir an folgendem arbeiten:**
+**Implementiert am** 9. März 2026
 
-**Option 2: INSTANT Effect Animations** (2-3 Stunden)
-- Grüner Blitz bei HEAL Cards
-- Roter Blitz bei DAMAGE Effects
-- Karten-Flug-Animation bei DRAW
-- Makes game feel more responsive
+### Was wurde gebaut:
 
-**Option 3: Drag-Drop Visual Feedback** (1-2 Stunden)
+**HEAL Animationen:**
+- Grüner Glow-Puls auf Player-HQ Health Bar
+- Aktiviert sich automatisch wenn INSTANT HEAL Karte gespielt wird
+- 800ms Animation - visuelles Feedback für Heilung
+- Log-Message: "💚 Heileffekt aktiviert!"
+
+**DAMAGE Animationen:**
+- Rotes Flash auf Gegner-HQ Health Bar
+- Aktiviert sich automatisch wenn INSTANT DAMAGE Karte gespielt wird
+- 600ms Animation - dramatischer Effekt für Angriff
+- Log-Message: "💥 Schadenseffekt!"
+
+**DRAW Animationen:**
+- Karten fliegen vom Deck zur Hand mit kubischem Easing
+- Karten skalieren down während sie fliegen (0.6x Größe am Ende)
+- 800ms Animation
+- Log-Message: "📨 {CardName} wurde gezogen!"
+
+### Technische Details:
+- CSS Keyframe Animationen (healPulse, damageFlash, cardFly)
+- React State Management (healEffect, damageEffect, drawingCardIds)
+- Modified playCard() to detect INSTANT effects and trigger animations
+- HealthBar Component updated mit effect props (healEffect, damageEffect)
+- CardTile Component erweitert mit drawing prop für DRAW Animation
+
+### Build Status:
+- ✅ Backend: TypeScript compilation OK
+- ✅ Frontend: 165.53 KB JS, 14.92 KB CSS
+- ✅ Git Commit: e80edf3
+
+---
+
+## 🔄 Nächste Implementierungs-Optionen
+
+**Status:** Option 2 ✅ Fertig. Jetzt bereit für:
+
+**Option 3: Drag-Drop Visual Feedback** (1-2 Stunden) - START NEXT
 - Drop-Zonen blinken/glühen wenn du Card draggst
 - Zeigt an wo du die Card spielen kannst
 - Visual Polish
 
-**Option 4: Gradual Damage System** (4-6 Stunden - CRITICAL)
+**Option 4: Gradual Damage System** (4-6 Stunden - CRITICAL) - HIGHEST PRIORITY LONG-TERM
 - Units haben separate Attack + HP Stats
 - Können graduell Schaden nehmen
 - Basis für Healing Cards
@@ -197,5 +229,5 @@ Bitte teste Folgendes und gib Feedback:
 
 ---
 
-**Status:** 🟢 Ready for Testing - Warte auf Session 2 Feedback
+**Status:** 🟡 Option 2 Fertig - Bereit für Option 3 oder 4?
 
