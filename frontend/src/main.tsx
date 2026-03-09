@@ -326,18 +326,6 @@ function CardTile(props: {
   const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
   
-  // Unit health bar - nur auf dem Board anzeigen
-  const showHealthBar = card.type === "UNIT" && card.power !== undefined && location === "board";
-  const maxPower = 5; // typical max power for display
-  const powerPercentage = showHealthBar ? Math.max(0, Math.min(100, ((card.power ?? 0) / maxPower) * 100)) : 0;
-  
-  let powerColor = "#4caf50"; // green
-  if (powerPercentage <= 25) {
-    powerColor = "#f44336"; // red
-  } else if (powerPercentage <= 50) {
-    powerColor = "#ff9800"; // orange
-  }
-  
   return (
     <article
       ref={setRef}
@@ -349,20 +337,6 @@ function CardTile(props: {
       <span className="name">{card.name}</span>
       <span className="meta">{card.type} | {card.zone}</span>
       <span className="meta">Kosten {card.cost}{card.power ? ` | PWR ${card.power}` : ""}</span>
-      
-      {showHealthBar && (
-        <div className="card-health-bar">
-          <div className="card-health-bg">
-            <div 
-              className="card-health-fill" 
-              style={{ 
-                width: `${powerPercentage}%`,
-                backgroundColor: powerColor
-              }}
-            />
-          </div>
-        </div>
-      )}
       
       {isAttacked && <span className="attacked-badge">Hat angegriffen</span>}
       <div className="card-tip">
