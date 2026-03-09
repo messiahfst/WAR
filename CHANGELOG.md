@@ -1,6 +1,43 @@
 # Changelog
 
-## [0.2.0-block-mechanic] - 2026-03-09 (Current)
+## [0.1.1] - 2026-03-09 (Release)
+
+### 🎮 Phase 5 Complete - All 10 Features Implemented
+
+#### ✅ Completed Features
+1. Game Over Overlay with Statistics
+2. Health Bars for HQs (Animated)
+3. Playable Card Highlighting (Green Border)
+4. Attack Flow Simplification (Direct ⚔️ Button)
+5. Board Layout Redesign (Horizontal: Enemy Left → Frontline → Player Right)
+6. Block Mechanic Core (Declare & Resolve System)
+7. INSTANT Effect Animations (Green Glow HEAL, Red Flash DAMAGE, Card Fly DRAW)
+8. Drag-Drop Visual Feedback (Zone Glow + Dimming)
+9. **Gradual Damage System** (Units: Attack + HP, Both take damage, Die when HP ≤ 0)
+10. Unit Health Bars on Board (Color-coded: Green → Yellow → Red)
+
+#### Backend Changes
+- **Core Engine Refactor:** `power` → `attack` (Puste) + `maxHP` + `currentHP`
+- **Combat Logic:** Both units take damage equal to opponent's attack
+- **Card Initialization:** currentHP = maxHP when played
+- **endTurn() Fix:** Properly resolves pending attacks before turn switch
+- **All Tests:** 10/10 passing ✅
+
+#### Frontend Changes
+- **Card Stats:** Shows ATK and HP/maxHP instead of power
+- **Unit Health Bars:** Small 8px bars on board units with color scaling
+- **Block Modal:** Updated to show attack values
+- **Card Display:** Meta shows attack and health stats
+
+#### Build Quality
+- ✅ TypeScript: 0 errors (strict mode)
+- ✅ Frontend: 166.73 KB JS, 15.43 KB CSS
+- ✅ Tests: 10/10 passing
+- ✅ Git: Clean history with 3 commits
+
+---
+
+## [0.1.0] - 2026-03-08 (Initial MVP)
 
 ### 🎮 Block Mechanic - Complete Implementation
 

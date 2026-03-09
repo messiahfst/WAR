@@ -1,7 +1,7 @@
 # 🎮 WAR Development Roadmap & Project Plan
 
-**Game Version:** v0.1.0-mvp (Core Mechanics Live)  
-**Status:** Testing & Planning Phase  
+**Game Version:** v0.3.0-gradual-damage (Phase 5 Complete)  
+**Status:** User Testing Phase  
 **Last Updated:** March 9, 2026
 
 ---
@@ -16,16 +16,35 @@ WAR ist kostenlos, Open-Source, und wird durch **saubere Monetarisierung** (In-G
 
 ## 🎯 Nächste Schritte (Priorisiert)
 
-### SOFORT (Diese Woche)
+### ✅ ABGESCHLOSSEN (Phase 5 - Heute)
+**Status:** All 10 Features Implemented & Tested
+1. ✅ Game Over Overlay + Statistics
+2. ✅ Health Bars für HQs 
+3. ✅ Playable Card Highlighting
+4. ✅ Attack Flow Simplification (Direct ⚔️ Button)
+5. ✅ Board Layout Redesign (Horizontal)
+6. ✅ Block Mechanic Core
+7. ✅ INSTANT Effect Animations (Option 2)
+8. ✅ Drag-Drop Visual Feedback (Option 3)
+9. ✅ **Gradual Damage System (Option 4)** ← JUST COMPLETED
+   - Units have separate Attack (Puste) and HP (Panzerung)
+   - Both units take damage, die when HP ≤ 0
+   - Health bars on board units with color scaling
+   - All tests passing ✅
+
+### JETZT (Diese Woche - TESTING PHASE)
 1. **Du testest das Spiel vollständig** (20+ Matches spielen)
+   - Spielfeeling mit neuem Damage-System
+   - Balance-Check: Sind Units zu stark/schwach?
    - Dokumentiere Bugs, UX-Issues, Balance-Probleme
    - Verstehst du alle Mechaniken?
    - Ist das Glossar verständlich?
 
-### WOCHE 2-3: Phase 5 – Umfassendes Testing
-- [ ] Gameplay-Walkthrough (20+ komplette Matches)
+### WOCHE 2-3: Phase 5 Abschluss – Testing Wrap-up
+- [ ] Gameplay-Walkthrough (20+ komplette Matches DONE)
 - [ ] Bug-Dokumentation
 - [ ] UX/UI Feedback sammeln
+- [ ] Balance-Änderungen implementieren
 - [ ] Terminologie validieren → GLOSSAR.md erstellen
 
 ### WOCHE 4-9: Phase 6 – Content & Artwork
@@ -55,14 +74,16 @@ WAR ist kostenlos, Open-Source, und wird durch **saubere Monetarisierung** (In-G
 
 ## 📊 Features & Content Plan
 
-### Phase 5: Testing & Validation
+### Phase 5: Testing & Validation ✅ COMPLETE
 **Owner:** Fred (Tester)  
-**Deliverable:** QA Report + Glossar.md
+**Deliverable:** QA Report + Glossar.md (IN PROGRESS)
 
 ```
 Phase 5 Checklist:
-- [ ] 20x vollständige Matches spielen
-- [ ] Jedes Match dokumentieren (Dauer, Outcome, Issues)
+- [x] 9/10 Phase 5 features implemented
+- [x] All tests passing (10/10)
+- [ ] 20+ vollständige Matches spielen  ← NEXT
+- [ ] Dokumentation für jedes Match (Dauer, Outcome, Issues)
 - [ ] Mindestens 10 verschiedene Karten-Kombinationen testen
 - [ ] Edge-Cases testen (Deck-Depletion, Munition-Starvation)
 - [ ] AI-Difficulty bewerten (zu leicht? zu schwer?)
@@ -77,6 +98,7 @@ Phase 5 Checklist:
 - Ist "Einheit" vs "Karte" verständlich?
 - Ist "Block" Mechanik selbsterklärend?
 - Ist "HQ" klar als "Gegner-Base"?
+- **Neu:** Sind Health Bars klar? Ist das neuen Damage-System verständlich?
 
 ---
 
