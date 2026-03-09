@@ -669,3 +669,86 @@ button:disabled {
   margin-top: 0.25rem;
   text-transform: uppercase;
 }
+
+/* Game Over Overlay */
+.game-over-overlay {
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.game-over-dialog {
+  max-width: 500px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.win-title {
+  font-size: 2.5rem;
+  color: #4caf50;
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.lose-title {
+  font-size: 2.5rem;
+  color: var(--accent-a);
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 0 20px rgba(255, 77, 109, 0.5);
+}
+
+.game-over-stats {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.stat-value {
+  color: var(--accent-b);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.modal-actions button.large {
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+}
+
+/* Playable Card Highlighting */
+.card.playable {
+  border-color: #4caf50;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4), 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+.card.playable:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.5), 0 0 0 2px rgba(76, 175, 80, 0.5);
+}
+
+.card.unplayable {
+  opacity: 0.5;
+  filter: grayscale(50%);
+  cursor: not-allowed;
+}
+
+.card.unplayable:hover {
+  transform: none;
+}

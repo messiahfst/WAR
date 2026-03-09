@@ -82,6 +82,50 @@ const CARD_RULES: Record<CardType, string> = {
   ABILITY: "Faehigkeit - permanenter Effekt solange auf dem Board."
 };
 
+function GameOverModal(props: {
+  state: GameState;
+  onNewGame: () => void;
+}) {
+  const { state, onNewGame } = props;
+  const winner = state.winnerId;
+  const isPlayerWin = winner === "player1";
+  const title = isPlayerWin ? "🎉 Du hast gewonnen!" : "💥 Du hast verloren!";
+  const reasonText = state.endReason === "LIFE_ZERO" ? "HQ zerstört" : "Deck leer";
+
+  return (
+    <div className="modal-overlay game-over-overlay">
+      <div className="modal-dialog game-over-dialog">
+        <h1 className={isPlayerWin ? "win-title" : "lose-title"}>{title}</h1>
+        <div className="game-over-stats">
+          <div className="stat-row">
+            <span className="stat-label">Zuege gespielt:</span>
+            <span className="stat-value">{state.turn}</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Gewinner:</span>
+            <span className="stat-value">{winner === "player1" ? "Du" : "Gegner (AI)"}</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Grund:</span>
+            <span className="stat-value">{reasonText}</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Dein HQ:</span>
+            <span className="stat-value">{state.players.player1.life} ❤️</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Gegner HQ:</span>
+            <span className="stat-value">{state.players.player2.life} ❤️</span>
+          </div>
+        </div>
+        <div className="modal-actions">
+          <button className="primary large" onClick={onNewGame}>Neues Spiel starten</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const api = {
   async createGame() {
     const r = await fetch("http://localhost:3000/api/game/create", { method: "POST" });
@@ -222,14 +266,15 @@ function CardTile(props: {
   draggable?: boolean;
   onDragStart?: (ev: React.DragEvent) => void;
   setRef?: (el: HTMLElement | null) => void;
+  isPlayable?: boolean;
 }) {
-  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef } = props;
+  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable } = props;
   const isAttacked = card.hasAttackedThisRound;
   
   return (
     <article
       ref={setRef}
-      className={`card tooltip-card ${selected ? "selected" : ""} ${animated ? "anim" : ""} ${focused ? "ai-focus" : ""} ${isAttacked ? "attacked" : ""}`}
+      className={`card tooltip-card ${selected ? "selected" : ""} ${animated ? "anim" : ""} ${focused ? "ai-focus" : ""} ${isAttacked ? "attacked" : ""} ${isPlayable === true ? "playable" : isPlayable === false ? "unplayable" : ""}`}
       onClick={() => owner && onDetailClick?.(card, owner)}
       draggable={draggable}
       onDragStart={onDragStart}
@@ -627,20 +672,24 @@ export function App() {
             <div className="hand-wrap">
               <p className="section-title">Hand (Klick = Details, Drag = Ausspielen)</p>
               <div className="cards-row hand-row">
-                {player?.hand.map((card) => (
-                  <CardTile
-                    key={`h-${card.id}`}
-                    card={card}
-                    selected={selectedCardId === card.id}
-                    animated={animatingCardIds.includes(card.id)}
-                    focused={false}
-                    owner="player1"
-                    onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedCardId(c.id); }}
-                    draggable
-                    onDragStart={(ev) => ev.dataTransfer.setData("text/plain", card.id)}
-                    setRef={setCardRef(`h:${card.id}`)}
-                  />
-                ))}
+                {player?.hand.map((card) => {
+                  const isPlayable = (player?.munition ?? 0) >= card.cost && isMyTurn && !busy && !state?.isGameOver;
+                  return (
+                    <CardTile
+                      key={`h-${card.id}`}
+                      card={card}
+                      selected={selectedCardId === card.id}
+                      animated={animatingCardIds.includes(card.id)}
+                      focused={false}
+                      owner="player1"
+                      onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedCardId(c.id); }}
+                      draggable
+                      onDragStart={(ev) => ev.dataTransfer.setData("text/plain", card.id)}
+                      setRef={setCardRef(`h:${card.id}`)}
+                      isPlayable={isPlayable}
+                    />
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -698,6 +747,9 @@ export function App() {
         </section>
       </main>
       {desktopWarning}
+      {state?.isGameOver && (
+        <GameOverModal state={state} onNewGame={newGame} />
+      )}
       <CardDetailModal
         card={detailCard}
         owner={detailCardOwner}
