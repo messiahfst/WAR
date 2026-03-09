@@ -124,14 +124,15 @@ describe("engine", () => {
 
     state.players.player1.munition = 5;
     
-    // Add unit with power 2 to board
+    // Add unit with attack 2 to board
     state.players.player1.board.push({
       id: "unit-1",
       name: "Infanterist",
       type: "UNIT",
       zone: "BODEN",
       cost: 1,
-      power: 2
+      attack: 2,
+      maxHP: 1
     });
     
     // Add ABILITY card to hand
@@ -148,7 +149,7 @@ describe("engine", () => {
 
     expect(afterPlay.players.player1.board.some(c => c.id === "ability-buff")).toBe(true);
     const unit = afterPlay.players.player1.board.find(c => c.id === "unit-1");
-    expect(unit?.power).toBe(3); // 2 + 1 buff
+    expect(unit?.attack).toBe(3); // 2 + 1 buff
   });
 
   it("includes ABILITY MUNITION_BOOST in munition calculation", () => {

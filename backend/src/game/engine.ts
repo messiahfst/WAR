@@ -80,7 +80,7 @@ function executeCardEffect(state: GameState, playerId: string, effect: CardEffec
       if (effect.target === "ALL_UNITS" || effect.target === "BOARD") {
         player.board.forEach((card) => {
           if (card.type === "UNIT") {
-            card.power = (card.power ?? 1) + effect.value;
+            card.attack = (card.attack ?? 1) + effect.value;
           }
         });
       }
@@ -165,6 +165,10 @@ export function playCard(gameId: string, playerId: string, cardId: string): Game
   player.hand.splice(cardIndex, 1);
 
   if (card.type === "UNIT" || card.type === "BUILDING" || card.type === "RESOURCE" || card.type === "ABILITY") {
+    // Initialize currentHP for UNIT cards
+    if (card.type === "UNIT" && card.maxHP) {
+      card.currentHP = card.maxHP;
+    }
     player.board.push(card);
     
     // Apply ABILITY effects immediately when played (e.g., Kommandozentrale buffing all units)
@@ -172,7 +176,7 @@ export function playCard(gameId: string, playerId: string, cardId: string): Game
       const buffValue = card.effect.value;
       player.board.forEach((boardCard) => {
         if (boardCard.type === "UNIT") {
-          boardCard.power = (boardCard.power ?? 1) + buffValue;
+          boardCard.attack = (boardCard.attack ?? 1) + buffValue;
         }
       });
     }
@@ -203,7 +207,16 @@ export function endTurn(gameId: string, playerId: string): GameState {
   // If there are pending attacks, resolve them first
   if (state.pendingAttacks && state.pendingAttacks.length > 0) {
     // This resolves combats with declared blocks, and unblocked attacks go to opponent's HQ
-    return resolvePendingAttacks(gameId, playerId);
+    resolvePendingAttacks(gameId, playerId);
+    // After resolving, reload state to get the updated game
+    const updatedState = getGame(gameId);
+    if (!updatedState || updatedState.isGameOver) {
+      return updatedState || state;
+    }
+    // Continue with normal turn end process below
+    state.players = updatedState.players;
+    state.pendingAttacks = updatedState.pendingAttacks;
+    state.declaredBlockers = updatedState.declaredBlockers;
   }
 
   const nextPlayerId = otherPlayerId(playerId);
@@ -347,23 +360,28 @@ export function resolvePendingAttacks(gameId: string, playerId: string): GameSta
     const blockerCardId = declaredBlockers[attack.attackerId];
     
     if (blockerCardId) {
-      // Combat between units
+      // Combat between units - both take damage
       const blockerCard = defender.board.find((c) => c.id === blockerCardId);
       if (blockerCard) {
-        const attackerPower = attackerCard.power ?? 1;
-        const blockerPower = blockerCard.power ?? 1;
+        const attackerAttack = attackerCard.attack ?? 1;
+        const blockerAttack = blockerCard.attack ?? 1;
 
-        if (attackerPower >= blockerPower) {
-          moveCardFromBoardToDiscard(defender, blockerCardId);
-        }
-        if (blockerPower >= attackerPower) {
+        // Both units take damage from each other
+        attackerCard.currentHP = (attackerCard.currentHP ?? attackerCard.maxHP ?? 1) - blockerAttack;
+        blockerCard.currentHP = (blockerCard.currentHP ?? blockerCard.maxHP ?? 1) - attackerAttack;
+
+        // Remove dead units
+        if (attackerCard.currentHP <= 0) {
           moveCardFromBoardToDiscard(attacker, attack.attackerId);
+        }
+        if (blockerCard.currentHP <= 0) {
+          moveCardFromBoardToDiscard(defender, blockerCardId);
         }
       }
     } else {
       // No block declared - direct damage to opponent HQ
-      const attackerPower = attackerCard.power ?? 1;
-      defender.life -= attackerPower;
+      const attackerAttack = attackerCard.attack ?? 1;
+      defender.life -= attackerAttack;
     }
   }
 

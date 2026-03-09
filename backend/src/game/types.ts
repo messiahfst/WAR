@@ -14,7 +14,9 @@ export interface Card {
   type: "UNIT" | "SPELL" | "BUILDING" | "TECH" | "RESOURCE" | "INSTANT" | "ABILITY";
   zone: Zone;
   cost: number;
-  power?: number;
+  attack?: number;      // Puste (Angriffskraft)
+  maxHP?: number;       // Panzerung max (Toughness)
+  currentHP?: number;   // Panzerung aktuell (Current health on board)
   hasAttackedThisRound?: boolean;
   effect?: CardEffect;
   description?: string;

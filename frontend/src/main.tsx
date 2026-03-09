@@ -19,7 +19,9 @@ type Card = {
   type: CardType;
   zone: Zone;
   cost: number;
-  power?: number;
+  attack?: number;      // Puste (Angriffskraft)
+  maxHP?: number;       // Panzerung (max health)
+  currentHP?: number;   // Current health on board
   hasAttackedThisRound?: boolean;
   effect?: CardEffect;
   description?: string;
@@ -287,10 +289,16 @@ function CardDetailModal(props: {
               <span className="label">Munitions-Kosten:</span>
               <span className="value cost-badge">{card.cost}</span>
             </div>
-            {card.power !== undefined && (
+            {card.attack !== undefined && (
               <div className="detail-row">
-                <span className="label">Kraft:</span>
-                <span className="value power-badge">{card.power}</span>
+                <span className="label">Puste:</span>
+                <span className="value power-badge">{card.attack}</span>
+              </div>
+            )}
+            {card.maxHP !== undefined && (
+              <div className="detail-row">
+                <span className="label">Panzerung:</span>
+                <span className="value power-badge">{card.maxHP}</span>
               </div>
             )}
           </div>
@@ -373,11 +381,11 @@ function BlockModal(props: {
                 background: isBlocked ? "rgba(40,167,69,0.1)" : "rgba(220,53,69,0.1)"
               }}>
                 <p style={{ marginTop: 0 }}>
-                  <strong>⚔️ {attacker?.name ?? "Unknown"}</strong> ({attacker?.power ?? 1} Puste)
+                  <strong>⚔️ {attacker?.name ?? "Unknown"}</strong> ({attacker?.attack ?? 1} Puste)
                 </p>
                 {isBlocked ? (
                   <p style={{ color: "#28a745", marginBottom: 0 }}>
-                    ✓ Blockiert von <strong>{blockerCard?.name}</strong> ({blockerCard?.power ?? 1} Puste)
+                    ✓ Blockiert von <strong>{blockerCard?.name}</strong> ({blockerCard?.attack ?? 1} Puste)
                   </p>
                 ) : (
                   <>
@@ -399,7 +407,7 @@ function BlockModal(props: {
                             fontSize: "0.85em"
                           }}
                         >
-                          {defender.name} ({defender.power ?? 1})
+                          {defender.name} ({defender.attack ?? 1})
                         </button>
                       ))}
                     </div>
@@ -444,6 +452,7 @@ function CardTile(props: {
 }) {
   const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location, canAttack, onAttackClick, drawing } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
+  const showHealthBar = location === "board" && card.type === "UNIT" && card.maxHP;
   
   return (
     <article
@@ -455,7 +464,23 @@ function CardTile(props: {
     >
       <span className="name">{card.name}</span>
       <span className="meta">{card.type} | {card.zone}</span>
-      <span className="meta">Kosten {card.cost}{card.power ? ` | PWR ${card.power}` : ""}</span>
+      <span className="meta">Kosten {card.cost}{card.attack ? ` | ATK ${card.attack}` : ""}{card.maxHP ? ` | HP ${card.currentHP ?? card.maxHP}/${card.maxHP}` : ""}</span>
+      
+      {showHealthBar && (
+        <div style={{ marginTop: "0.4rem", display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+          <div style={{ fontSize: "0.65rem", color: "#93a3c4", textTransform: "uppercase" }}>HP</div>
+          <div style={{ width: "100%", height: "8px", background: "rgba(0, 0, 0, 0.4)", borderRadius: "4px", overflow: "hidden", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+            <div 
+              style={{ 
+                height: "100%", 
+                width: `${Math.max(0, ((card.currentHP ?? card.maxHP) / (card.maxHP ?? 1)) * 100)}%`,
+                background: card.currentHP && card.maxHP && (card.currentHP / card.maxHP) <= 0.25 ? "#f44336" : card.currentHP && card.maxHP && (card.currentHP / card.maxHP) <= 0.5 ? "#ff9800" : "#4caf50",
+                transition: "width 0.3s ease, background 0.3s ease"
+              }}
+            />
+          </div>
+        </div>
+      )}
       
       {canAttack && onAttackClick && (
         <button 
@@ -1132,7 +1157,8 @@ export function App() {
                     <span>Typ</span><strong>{selectedCard.type}</strong>
                     <span>Zone</span><strong>{selectedCard.zone}</strong>
                     <span>Kosten</span><strong>{selectedCard.cost}</strong>
-                    <span>Power</span><strong>{selectedCard.power ?? "-"}</strong>
+                    {selectedCard.attack && <><span>Puste</span><strong>{selectedCard.attack}</strong></>}
+                    {selectedCard.maxHP && <><span>Panzerung</span><strong>{selectedCard.maxHP}</strong></>}
                   </div>
                   <p className="card-rules">{CARD_RULES[selectedCard.type]}</p>
                   <div className="actions" style={{ marginTop: "0.8rem" }}>
