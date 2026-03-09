@@ -321,9 +321,11 @@ function CardTile(props: {
   onDragStart?: (ev: React.DragEvent) => void;
   setRef?: (el: HTMLElement | null) => void;
   isPlayable?: boolean;
-  location?: "hand" | "board"; // NEW: track where card is displayed
+  location?: "hand" | "board";
+  canAttack?: boolean;
+  onAttackClick?: (cardId: string) => void;
 }) {
-  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location } = props;
+  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location, canAttack, onAttackClick } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
   
   return (
@@ -338,11 +340,24 @@ function CardTile(props: {
       <span className="meta">{card.type} | {card.zone}</span>
       <span className="meta">Kosten {card.cost}{card.power ? ` | PWR ${card.power}` : ""}</span>
       
+      {canAttack && onAttackClick && (
+        <button 
+          className="card-action-btn attack-btn" 
+          onClick={(e) => {
+            e.stopPropagation();
+            onAttackClick(card.id);
+          }}
+        >
+          ⚔️ Angreifen
+        </button>
+      )}
+      
       {isAttacked && <span className="attacked-badge">Hat angegriffen</span>}
       <div className="card-tip">
         <strong>{card.name}</strong>
         <p>{CARD_RULES[card.type]}</p>
-        <p><small>Klick: Details | Drag: Ausspielen</small></p>
+        {location === "hand" && <p><small>Klick: Details | Drag: Ausspielen</small></p>}
+        {location === "board" && <p><small>Klick: Details anzeigen</small></p>}
       </div>
     </article>
   );
@@ -487,6 +502,36 @@ export function App() {
         await showTrail(`p1:${attacker.id}`, "anchor:enemyHQ", "ATTACK", `ATTACK: ${attacker.name} -> Gegner-HQ`);
       }
       await flashCard(selectedAttackerId);
+      if (res.isGameOver) {
+        addLog(`Match beendet: ${res.endReason}`);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const attackWithCard = async (attackerCardId: string) => {
+    if (!state || !isMyTurn || busy || state.isGameOver) {
+      return;
+    }
+
+    const attacker = player?.board.find((c) => c.id === attackerCardId);
+    if (!attacker || attacker.hasAttackedThisRound) {
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await api.attack(state.gameId, "player1", attackerCardId);
+      if (isError(res)) {
+        addLog(`Angriff fehlgeschlagen: ${res.error}`);
+        return;
+      }
+
+      setState(res);
+      addLog(`Du greifst mit ${attacker.name} an.`);
+      await showTrail(`p1:${attacker.id}`, "anchor:enemyHQ", "ATTACK", `ATTACK: ${attacker.name} -> Gegner-HQ`);
+      await flashCard(attackerCardId);
       if (res.isGameOver) {
         addLog(`Match beendet: ${res.endReason}`);
       }
@@ -716,19 +761,24 @@ export function App() {
                       Drop-Zone {zone}: passende Handkarte hier ablegen
                     </div>
                     <div className="cards-row">
-                      {cardsInZone(player?.board, zone).map((card) => (
-                        <CardTile
-                          key={`p1-${card.id}-${zone}`}
-                          card={card}
-                          selected={selectedAttackerId === card.id}
-                          animated={animatingCardIds.includes(card.id)}
-                          focused={false}
-                          owner="player1"
-                          onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedAttackerId(c.id); }}
-                          setRef={setCardRef(`p1:${card.id}`)}
-                          location="board"
-                        />
-                      ))}
+                      {cardsInZone(player?.board, zone).map((card) => {
+                        const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && isMyTurn && !busy && !state?.isGameOver;
+                        return (
+                          <CardTile
+                            key={`p1-${card.id}-${zone}`}
+                            card={card}
+                            selected={selectedAttackerId === card.id}
+                            animated={animatingCardIds.includes(card.id)}
+                            focused={false}
+                            owner="player1"
+                            onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); }}
+                            setRef={setCardRef(`p1:${card.id}`)}
+                            location="board"
+                            canAttack={canAttack}
+                            onAttackClick={attackWithCard}
+                          />
+                        );
+                      })}
                     </div>
                   </section>
                 );

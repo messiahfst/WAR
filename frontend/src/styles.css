@@ -383,6 +383,36 @@ button:disabled {
   letter-spacing: 0.5px;
 }
 
+/* Card Action Button (Attack) */
+.card-action-btn {
+  display: block;
+  width: calc(100% + 8px);
+  margin: 0.5rem -4px 0;
+  padding: 0.5rem 0.6rem;
+  background: linear-gradient(135deg, #ff4d6d, #ff6b88);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.4);
+}
+
+.card-action-btn:hover {
+  background: linear-gradient(135deg, #ff6b88, #ff4d6d);
+  box-shadow: 0 4px 12px rgba(255, 77, 109, 0.6);
+  transform: translateY(-2px);
+}
+
+.card-action-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 6px rgba(255, 77, 109, 0.5);
+}
+
 /* Card Health Bar */
 .card-health-bar {
   margin-top: 0.5rem;
