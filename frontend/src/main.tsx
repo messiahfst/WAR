@@ -725,71 +725,83 @@ export function App() {
               ) : null}
             </svg>
 
-            <div className="zones-stack">
-              {ZONES.map((zone) => {
-                const canAttackThisZone = selectedAttacker ? ATTACK_MAP[selectedAttacker.zone].includes(zone) : false;
-                return (
-                  <section key={zone} className={`zone-lane ${selectedAttacker ? (canAttackThisZone ? "attackable" : "blocked") : ""}`}>
-                    <header className="zone-head">
-                      <p className="section-title">{zone}</p>
-                      <span className="zone-hint">{ZONE_HINT[zone]}</span>
-                    </header>
-                    <div className="cards-row enemy-row">
-                      {cardsInZone(enemy?.board, zone).map((card) => (
-                        <CardTile
-                          key={`p2-${card.id}-${zone}`}
-                          card={card}
-                          selected={selectedDefenderId === card.id}
-                          animated={animatingCardIds.includes(card.id)}
-                          focused={aiFocusCardId === card.id}
-                          owner="player2"
-                          onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedDefenderId(c.id); }}
-                          setRef={setCardRef(`p2:${card.id}`)}
-                          location="board"
-                        />
-                      ))}
-                    </div>
-                    <div
-                      className={`drop-zone ${dragZone === zone ? "hot" : ""}`}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragZone(zone);
-                      }}
-                      onDragLeave={() => setDragZone(null)}
-                      onDrop={(ev) => onDropZone(ev, zone)}
-                    >
-                      Drop-Zone {zone}: passende Handkarte hier ablegen
-                    </div>
-                    <div className="cards-row">
-                      {cardsInZone(player?.board, zone).map((card) => {
-                        const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && isMyTurn && !busy && !state?.isGameOver;
-                        return (
+            <div className="battlefield">
+              <div className="player-side enemy-side">
+                <h3 className="side-title">Gegner</h3>
+                {ZONES.map((zone) => {
+                  return (
+                    <section key={`enemy-${zone}`} className="zone-column">
+                      <header className="zone-header">
+                        <p className="zone-name">{zone}</p>
+                      </header>
+                      <div className="cards-area enemy-area">
+                        {cardsInZone(enemy?.board, zone).map((card) => (
                           <CardTile
-                            key={`p1-${card.id}-${zone}`}
+                            key={`p2-${card.id}-${zone}`}
                             card={card}
-                            selected={selectedAttackerId === card.id}
+                            selected={selectedDefenderId === card.id}
                             animated={animatingCardIds.includes(card.id)}
-                            focused={false}
-                            owner="player1"
-                            onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); }}
-                            setRef={setCardRef(`p1:${card.id}`)}
+                            focused={aiFocusCardId === card.id}
+                            owner="player2"
+                            onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedDefenderId(c.id); }}
+                            setRef={setCardRef(`p2:${card.id}`)}
                             location="board"
-                            canAttack={canAttack}
-                            onAttackClick={attackWithCard}
                           />
-                        );
-                      })}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
 
-            <div className="zone-row">
-              <p className="section-title">Combat Controls</p>
-              <div className="actions">
-                <button className="tooltip" data-tip={selectedAttacker?.hasAttackedThisRound ? "Diese Einheit hat bereits in dieser Runde angegriffen" : "Direktangriff mit ausgewaehlter Einheit"} onClick={attack} disabled={!selectedAttackerId || !isMyTurn || busy || !state || state.isGameOver || selectedAttacker?.hasAttackedThisRound}>Angriff</button>
-                <button className="tooltip" data-tip="Block simulieren: Defender muss markiert sein" onClick={block} disabled={!selectedAttackerId || !selectedDefenderId || busy || !state || state.isGameOver}>Block aufloesen</button>
+              <div className="frontline-divider">
+                <span className="frontline-label">⚔️ FRONT ⚔️</span>
+              </div>
+
+              <div className="player-side">
+                <h3 className="side-title">Du</h3>
+                {ZONES.map((zone) => {
+                  const canAttackThisZone = selectedAttacker ? ATTACK_MAP[selectedAttacker.zone].includes(zone) : false;
+                  return (
+                    <section key={`player-${zone}`} className={`zone-column ${selectedAttacker ? (canAttackThisZone ? "attackable" : "blocked") : ""}`}>
+                      <header className="zone-header">
+                        <p className="zone-name">{zone}</p>
+                        <span className="zone-hint-small">{ZONE_HINT[zone]}</span>
+                      </header>
+                      <div
+                        className={`drop-zone ${dragZone === zone ? "hot" : ""}`}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setDragZone(zone);
+                        }}
+                        onDragLeave={() => setDragZone(null)}
+                        onDrop={(ev) => onDropZone(ev, zone)}
+                      >
+                        {zone}
+                      </div>
+                      <div className="cards-area player-area">
+                        {cardsInZone(player?.board, zone).map((card) => {
+                          const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && isMyTurn && !busy && !state?.isGameOver;
+                          return (
+                            <CardTile
+                              key={`p1-${card.id}-${zone}`}
+                              card={card}
+                              selected={selectedAttackerId === card.id}
+                              animated={animatingCardIds.includes(card.id)}
+                              focused={false}
+                              owner="player1"
+                              onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); }}
+                              setRef={setCardRef(`p1:${card.id}`)}
+                              location="board"
+                              canAttack={canAttack}
+                              onAttackClick={attackWithCard}
+                            />
+                          );
+                        })}
+                      </div>
+                    </section>
+                  );
+                })}
               </div>
             </div>
 
