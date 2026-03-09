@@ -1003,3 +1003,55 @@ button:disabled {
 .card.unplayable:hover {
   transform: none;
 }
+
+/* INSTANT Effect Animations */
+
+/* HEAL - Green glow on health bar */
+.health-bar-container.heal-pulse {
+  animation: healPulse 800ms ease-out;
+}
+
+@keyframes healPulse {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(76, 175, 80, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(76, 175, 80, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(76, 175, 80, 0));
+  }
+}
+
+/* DAMAGE - Red flash on health bar */
+.health-bar-container.damage-flash {
+  animation: damageFlash 600ms ease-out;
+}
+
+@keyframes damageFlash {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(244, 67, 54, 0));
+  }
+  30% {
+    filter: drop-shadow(0 0 16px rgba(244, 67, 54, 1));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(244, 67, 54, 0));
+  }
+}
+
+/* DRAW - Card flying animation */
+.card.draw-fly {
+  animation: cardFly 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(200px, -80px) scale(0.6);
+    opacity: 0.3;
+  }
+}

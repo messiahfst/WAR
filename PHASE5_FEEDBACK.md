@@ -129,13 +129,73 @@
 
 ---
 
-## 🔄 Nächste Schritte
+## 🎮 Feedback Session 2 (Nach Block Mechanic Implementation)
 
-1. Implementiere Phase 5.1 (schnelle Fixes)
-2. Teste erneut mit Fred
-3. Gehe zu Phase 5.2 (Board Redesign)
-4. Weitere Testspiele (Ziel: 20+ Matches bis vollständiges Phase 5 Sign-off)
+**Datum:** 9. März 2026  
+**Stand:** Nach implementierung von Block Mechanic + Board Redesign + Attack Flow Simplification  
+
+### ✅ Implementierte Fixes seit Session 1
+
+Folgende Kritikpunkte wurden behoben:
+
+1. **Attack Flow Simplifizierung** ✓
+   - Direkter "⚔️ Angreifen" Button auf Units
+   - Kein Modal-Umweg mehr
+   - Ein Klick = Angriff startet
+   - Dadurch viel intuitiver
+
+2. **Board Layout Redesign** ✓
+   - Gegner links, Spieler rechts
+   - Frontlinie in der Mitte mit "⚔️ FRONT ⚔️" Label
+   - 4 Zonen vertikal gestapelt pro Seite
+   - Keine Scrollbalken mehr
+   - Klare räumliche Struktur
+
+3. **Block Mechanic** ✓
+   - Wenn Gegner angreift: BlockModal erscheint
+   - Wähle Blocker für jeden Angriff
+   - Automatische Kampf-Auflösung
+   - AI blockiert automatisch (70% Chance)
+   - Beide Units können gemäß Machtvergleich sterben
+
+4. **Game Over Clarity** ✓
+   - Overlay mit Win/Loss Status
+   - Spielstatistiken (Zuege, Leben, Decks)
+   - Klare Erklärung warum Spiel endet
+
+### 🟡 Nächste Session Feedback Erwartungen
+
+Bitte teste Folgendes und gib Feedback:
+- Fühlt sich der Attack Flow jetzt besser an?
+- Ist die Board-Struktur mit Gegner-Links/Spieler-Rechts intuitiv?
+- Funktioniert Block-Mechanic korrekt?
+- Sind die Block-Entscheidungen verständlich?
+- Wo sind noch Probleme?
 
 ---
 
-**Status:** 🟡 In Progress - Feedback wird kontinuierlich implementiert
+## 🔄 Nächste Implementierungs-Phase (Nach Session 2)
+
+**Nach deinem Testing (10-20 Spiele) können wir an folgendem arbeiten:**
+
+**Option 2: INSTANT Effect Animations** (2-3 Stunden)
+- Grüner Blitz bei HEAL Cards
+- Roter Blitz bei DAMAGE Effects
+- Karten-Flug-Animation bei DRAW
+- Makes game feel more responsive
+
+**Option 3: Drag-Drop Visual Feedback** (1-2 Stunden)
+- Drop-Zonen blinken/glühen wenn du Card draggst
+- Zeigt an wo du die Card spielen kannst
+- Visual Polish
+
+**Option 4: Gradual Damage System** (4-6 Stunden - CRITICAL)
+- Units haben separate Attack + HP Stats
+- Können graduell Schaden nehmen
+- Basis für Healing Cards
+- Große Engine-Refactoring
+
+---
+
+**Status:** 🟢 Ready for Testing - Warte auf Session 2 Feedback
+

@@ -32,8 +32,8 @@ npm run lint
 
 ---
 
-✅ **Was funktioniert:** Core Game, Attack/Block System, Kartendetails, verbesserte UX  
-⏳ **Was kommt:** 150+ Karten mit Artwork, Account-System, PvP, Campaign
+✅ **Was funktioniert:** Core Game, Attack/Block System, Card Details, UX verbessert  
+⏳ **Was kommt:** INSTANT Animations, Drag-Drop Feedback, Gradual Damage System, 150+ Karten
 
 **Detaillierter Plan:** Siehe [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md)
 
@@ -75,7 +75,7 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
 
 > **Kontext bewahren:** Alle geplanten Features, Bugs und Verbesserungen zentral gesammelt
 
-### 🔴 Phase 5 - Critical UX Fixes (JETZT)
+### 🔴 Phase 5 - Critical UX Fixes & Block Mechanic (IN ARBEIT)
 
 **User Testing Session 1 - Identifizierte Probleme:**
 
@@ -85,25 +85,20 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
 - [x] **Health Bars für HQs** - Visuelle Anzeige in Topbar
 - [x] **BUG: hasAttackedThisRound** - Hand-Karten zeigten fälschlicherweise "Hat angegriffen"
 - [x] **Playable Card Highlighting** - Grüne Umrandung für spielbare Karten
+- [x] **Simplify Attack Flow** - Direkter "Angreifen"-Button auf Units (keine Modal-Umwege)
+- [x] **Board Layout Redesign** - Horizontal: Gegner links | Front-Divider | Spieler rechts
+- [x] **Block Mechanic Core** - Vollständig implementiert:
+  - Backend: Angriffszustand (pendingAttacks), Block-Deklaration, Combat-Auflösung
+  - Frontend: BlockModal für Blocker-Auswahl
+  - AI: Automatische Block-Entscheidungen mit Logik
 
-#### 🔴 Kritisch & Dringend
-- [ ] **Simplify Attack Flow** - Karte anklicken → Attack direkt (Modal entfernen aus Flow)
-  - Problem: Zu viele Klicks (Karte → Modal → Close → Attack Button)
-  - Ziel: Direkter "Attack"-Modus ohne Modal-Umweg
-  
-- [ ] **Board Layout Redesign** - Front links-rechts statt vertikal (GROSSER UMBAU, 1-2 Tage)
-  - Problem: 4 Zonen vermischen sich visuell, Scrollbar erscheint
-  - Ziel: Gegner links, Spieler rechts, 4 Sektionen groß, klare Front-Linie
-  - Details: Siehe [PHASE5_FEEDBACK.md](./PHASE5_FEEDBACK.md) Punkt #3
-
-- [ ] **Block Mechanic UX** - Blocken-Interface klarer gestalten
-  - Problem: "auch das angreifen immernoch kommt das overlay... das capiert keiner"
-  - Ziel: Inline-Block-Selection oder visueller Kampf-Modus
-
-#### ⚠️ Wichtig (Phase 5 Fortsetzung)
-- [ ] **Drag-Drop Visual Feedback** - Drop-Zonen highlighten während Drag
-- [ ] **INSTANT Effect Animations** - Visuelle Effekte bei HEAL/DAMAGE/DRAW
-- [ ] **Combat Animations** - Kampf zwischen Units visualisieren
+#### ⏳ Phase 5 Fortsetzung (Nach Testing)
+- [ ] **INSTANT Effect Animations** - Grüner Blitz bei HEAL, roter Blitz bei DAMAGE, Karten-Flug bei DRAW
+  - Zeitaufwand: 2-3 Stunden
+- [ ] **Drag-Drop Visual Feedback** - Drop-Zonen highlighten/glühen während Drag
+  - Zeitaufwand: 1-2 Stunden
+- [ ] **Combat Animations** - Visuelle Kampf-Animation zwischen blockenden Units
+  - Zeitaufwand: optional/polish feature
 
 ---
 

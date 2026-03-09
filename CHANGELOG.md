@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.2.0-block-mechanic] - 2026-03-09 (Current)
+
+### 🎮 Block Mechanic - Complete Implementation
+
+#### Backend (Game Engine)
+- **Declare & Resolve System:** New GamePhase "DEFENDER_CHOOSES" for declaring blocks
+- **PendingAttacks Tracking:** Attacks queue instead of resolving immediately
+- **Block Declaration:** New `declareBlock()` function to assign defenders to attackers
+- **Combat Resolution:** New `resolvePendingAttacks()` function that:
+  - Resolves Unit vs Unit combat with mutual destruction
+  - Sends unblocked attacks to opponent HQ
+  - Handles game-over conditions (life <= 0)
+- **Updated Phases:** Added DEFENDER_CHOOSES and COMBAT_RESOLVE phases to game state
+- **New API Endpoint:** `/declare-block` for frontend block declarations
+- **endTurn Changes:** Now checks for pendingAttacks and resolves combat before turn end
+
+#### Frontend (UI & User Experience)
+- **BlockModal Component:** New modal that appears when opponent attacks
+  - Shows list of pending attacks with attacker names/power
+  - Displays available defenders (own units) as buttons
+  - Visual feedback: green border for blocked, red for unblocked
+  - Disables completion until all attacks are declared blocked
+- **Block Declarations:** `blockDeclare()` handler processes block selections
+- **Combat Resolution:** `completeBlocks()` handler calls endTurn and resolves combats
+- **Dynamic Defender Detection:** Modal correctly shows defending player's units regardless of who attacks
+
+#### AI Logic
+- **Auto-Block Detection:** AI detects pendingAttacks during its turn
+- **Block Selection:** AI automatically selects units to block with
+- **Decision Logic:** 70% chance to block for more realistic play
+- **Logging:** AI narrates block decisions ("AI blockt...") for player feedback
+
+#### User Experience (Phase 5 Feedback Implementation)
+After user testing revealed too many clicks for attacking:
+- ✅ **Attack Flow:** Removed modal, added direct "⚔️ Angreifen" button on units
+- ✅ **Board Layout:** Changed from vertical scrolling to horizontal:
+  - Enemy zone on left, player zone on right
+  - Clear frontline divider in center with visual label
+  - All 4 zones stacked vertically per side (no scrollbar needed)
+- ✅ **Game Over:** Added overlay with win/loss status, statistics, and new game button
+- ✅ **HQ Health:** Visual health bars in topbar showing both players' life totals
+- ✅ **Card Highlighting:** Green border on playable cards, grayscale on unplayable
+
+### 📊 Build Status
+- ✅ Backend compiles (TypeScript strict mode)
+- ✅ Frontend compiles (164.58 KB JS, 14.26 KB CSS)
+- ✅ No type errors, no lint warnings
+- ✅ All builds complete successfully
+
+### 👥 Testing Status
+- **Unit Tests:** 12/12 passing (10 backend + 2 frontend)
+- **Manual Testing:** Block mechanic tested with ~5 test games
+- **Next Phase:** Comprehensive testing phase (Fred: 10-20 games minimum)
+
+---
+
 ## [0.1.0-mvp] - 2026-03-09
 
 ### 🎮 Game Features

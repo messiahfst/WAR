@@ -88,8 +88,10 @@ function HealthBar(props: {
   max: number;
   label: string;
   isPlayer: boolean;
+  healEffect?: boolean;
+  damageEffect?: boolean;
 }) {
-  const { current, max, label, isPlayer } = props;
+  const { current, max, label, isPlayer, healEffect, damageEffect } = props;
   const percentage = Math.max(0, Math.min(100, (current / max) * 100));
   
   let barColor = "#4caf50"; // green
@@ -99,8 +101,15 @@ function HealthBar(props: {
     barColor = "#ff9800"; // orange
   }
   
+  let animationClass = "";
+  if (healEffect && isPlayer) {
+    animationClass = "heal-pulse";
+  } else if (damageEffect && !isPlayer) {
+    animationClass = "damage-flash";
+  }
+  
   return (
-    <div className={`health-bar-container ${isPlayer ? "player" : "enemy"}`}>
+    <div className={`health-bar-container ${isPlayer ? "player" : "enemy"} ${animationClass}`}>
       <div className="health-bar-label">{label}</div>
       <div className="health-bar-wrapper">
         <div className="health-bar-bg">
@@ -431,14 +440,15 @@ function CardTile(props: {
   location?: "hand" | "board";
   canAttack?: boolean;
   onAttackClick?: (cardId: string) => void;
+  drawing?: boolean;
 }) {
-  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location, canAttack, onAttackClick } = props;
+  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location, canAttack, onAttackClick, drawing } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
   
   return (
     <article
       ref={setRef}
-      className={`card tooltip-card ${selected ? "selected" : ""} ${animated ? "anim" : ""} ${focused ? "ai-focus" : ""} ${isAttacked ? "attacked" : ""} ${isPlayable === true ? "playable" : isPlayable === false ? "unplayable" : ""}`}
+      className={`card tooltip-card ${selected ? "selected" : ""} ${animated ? "anim" : ""} ${drawing ? "draw-fly" : ""} ${focused ? "ai-focus" : ""} ${isAttacked ? "attacked" : ""} ${isPlayable === true ? "playable" : isPlayable === false ? "unplayable" : ""}`}
       onClick={() => owner && onDetailClick?.(card, owner)}
       draggable={draggable}
       onDragStart={onDragStart}
@@ -479,6 +489,7 @@ export function App() {
   const [dragZone, setDragZone] = useState<Zone | null>(null);
   const [log, setLog] = useState<string[]>([]);
   const [animatingCardIds, setAnimatingCardIds] = useState<string[]>([]);
+  const [drawingCardIds, setDrawingCardIds] = useState<string[]>([]);
   const [aiFocusCardId, setAiFocusCardId] = useState<string | null>(null);
   const [trailLine, setTrailLine] = useState<TrailLine | null>(null);
   const [trailLabel, setTrailLabel] = useState<string>("Combat-Trail bereit");
@@ -486,6 +497,8 @@ export function App() {
   const [detailCardOwner, setDetailCardOwner] = useState<"player1" | "player2" | null>(null);
   const [blockingAttackerId, setBlockingAttackerId] = useState<string | null>(null);
   const [declaredBlockers, setDeclaredBlockers] = useState<Record<string, string>>({});
+  const [healEffect, setHealEffect] = useState(false);
+  const [damageEffect, setDamageEffect] = useState(false);
 
   const boardRef = useRef<HTMLDivElement | null>(null);
   const enemyHqRef = useRef<HTMLDivElement | null>(null);
@@ -545,6 +558,27 @@ export function App() {
     setTrailLine(null);
   };
 
+  const triggerHealEffect = async () => {
+    setHealEffect(true);
+    addLog("💚 Heileffekt aktiviert!");
+    await delay(800);
+    setHealEffect(false);
+  };
+
+  const triggerDamageEffect = async () => {
+    setDamageEffect(true);
+    addLog("💥 Schadenseffekt!");
+    await delay(600);
+    setDamageEffect(false);
+  };
+
+  const triggerDrawEffect = async (card: Card) => {
+    setDrawingCardIds((prev) => [...prev, card.id]);
+    addLog(`📨 ${card.name} wurde gezogen!`);
+    await delay(800);
+    setDrawingCardIds((prev) => prev.filter((id) => id !== card.id));
+  };
+
   const syncState = async (gameId: string) => {
     const s = await api.state(gameId);
     setState(s);
@@ -561,6 +595,10 @@ export function App() {
       setSelectedAttackerId(null);
       setSelectedDefenderId(null);
       setTrailLabel("Combat-Trail bereit");
+      setAnimatingCardIds([]);
+      setDrawingCardIds([]);
+      setHealEffect(false);
+      setDamageEffect(false);
     } finally {
       setBusy(false);
     }
@@ -571,6 +609,7 @@ export function App() {
       return;
     }
 
+    const prevState = state;
     setBusy(true);
     try {
       const res = await api.play(state.gameId, "player1", cardId);
@@ -579,11 +618,43 @@ export function App() {
         return;
       }
 
-      const played = player?.hand.find((c) => c.id === cardId);
+      const played = player?.hand.find((c) => c.id === cardId) ?? null;
       setState(res);
       if (played) {
         addLog(`Du spielst ${played.name} (${source === "drag" ? "Drag" : "Button"}).`);
         await flashCard(played.id);
+        
+        // Handle INSTANT card effects
+        if (played.type === "INSTANT" && played.effect) {
+          const effect = played.effect;
+          
+          switch (effect.type) {
+            case "HEAL":
+              await delay(200);
+              await triggerHealEffect();
+              break;
+              
+            case "DAMAGE":
+              await delay(200);
+              await triggerDamageEffect();
+              break;
+              
+            case "DRAW":
+              // Animate drawn cards
+              if (effect.value && effect.value > 0) {
+                await delay(200);
+                const drawnCount = Math.min(effect.value, 2);
+                for (let i = 0; i < drawnCount; i++) {
+                  const newCard = res.players.player1.hand[res.players.player1.hand.length - (drawnCount - i)];
+                  if (newCard) {
+                    await triggerDrawEffect(newCard);
+                    await delay(150);
+                  }
+                }
+              }
+              break;
+          }
+        }
       }
       setSelectedCardId(null);
     } finally {
@@ -886,12 +957,14 @@ export function App() {
               max={20}
               label="Dein HQ"
               isPlayer={true}
+              healEffect={healEffect}
             />
             <HealthBar 
               current={enemy?.life ?? 20}
               max={20}
               label="Gegner HQ"
               isPlayer={false}
+              damageEffect={damageEffect}
             />
           </div>
           
@@ -941,6 +1014,7 @@ export function App() {
                             onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedDefenderId(c.id); }}
                             setRef={setCardRef(`p2:${card.id}`)}
                             location="board"
+                            drawing={false}
                           />
                         ))}
                       </div>
@@ -990,6 +1064,7 @@ export function App() {
                               location="board"
                               canAttack={canAttack}
                               onAttackClick={attackWithCard}
+                              drawing={false}
                             />
                           );
                         })}
@@ -1019,6 +1094,7 @@ export function App() {
                       setRef={setCardRef(`h:${card.id}`)}
                       isPlayable={isPlayable}
                       location="hand"
+                      drawing={drawingCardIds.includes(card.id)}
                     />
                   );
                 })}
