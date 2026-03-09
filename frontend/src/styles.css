@@ -601,7 +601,7 @@ button:disabled {
   font-size: 0.8rem;
   display: grid;
   place-items: center;
-  transition: all 140ms ease;
+  transition: all 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
   background: rgba(88, 107, 146, 0.05);
 }
 
@@ -615,7 +615,34 @@ button:disabled {
   border-color: var(--accent-b);
   background: rgba(36, 211, 255, 0.15);
   border-width: 3px;
-  box-shadow: inset 0 0 12px rgba(36, 211, 255, 0.1);
+  box-shadow: inset 0 0 12px rgba(36, 211, 255, 0.1), 0 0 20px rgba(36, 211, 255, 0.25);
+  animation: dropZoneGlow 600ms ease-in-out infinite;
+}
+
+@keyframes dropZoneGlow {
+  0%, 100% {
+    box-shadow: inset 0 0 12px rgba(36, 211, 255, 0.1), 0 0 20px rgba(36, 211, 255, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: inset 0 0 16px rgba(36, 211, 255, 0.2), 0 0 32px rgba(36, 211, 255, 0.35);
+    transform: scale(1.01);
+  }
+}
+
+.zone-column.drag-active {
+  opacity: 0.6;
+}
+
+.zone-column.drag-active .drop-zone {
+  opacity: 0.5;
+  border-color: #586b92;
+}
+
+.zone-column.drag-active .drop-zone.hot {
+  opacity: 1;
+  border-color: var(--accent-b);
+  animation: dropZoneGlow 600ms ease-in-out infinite;
 }
 
 .sidebar {

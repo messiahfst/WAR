@@ -487,6 +487,7 @@ export function App() {
   const [selectedDefenderId, setSelectedDefenderId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [dragZone, setDragZone] = useState<Zone | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [log, setLog] = useState<string[]>([]);
   const [animatingCardIds, setAnimatingCardIds] = useState<string[]>([]);
   const [drawingCardIds, setDrawingCardIds] = useState<string[]>([]);
@@ -916,6 +917,7 @@ export function App() {
   const onDropZone = async (ev: React.DragEvent, zone: Zone) => {
     ev.preventDefault();
     setDragZone(null);
+    setIsDragging(false);
     const cardId = ev.dataTransfer.getData("text/plain");
     const card = player?.hand.find((c) => c.id === cardId);
     if (!card) {
@@ -980,7 +982,14 @@ export function App() {
         </header>
 
         <section className="layout">
-          <section className="board" ref={boardRef}>
+          <section 
+            className="board" 
+            ref={boardRef}
+            onDragEnd={() => {
+              setDragZone(null);
+              setIsDragging(false);
+            }}
+          >
             <div className="combat-strip">
               <div className="trail idle">{trailLabel}</div>
             </div>
@@ -1032,7 +1041,7 @@ export function App() {
                 {ZONES.map((zone) => {
                   const canAttackThisZone = selectedAttacker ? ATTACK_MAP[selectedAttacker.zone].includes(zone) : false;
                   return (
-                    <section key={`player-${zone}`} className={`zone-column ${selectedAttacker ? (canAttackThisZone ? "attackable" : "blocked") : ""}`}>
+                    <section key={`player-${zone}`} className={`zone-column ${selectedAttacker ? (canAttackThisZone ? "attackable" : "blocked") : ""} ${isDragging ? "drag-active" : ""}`}>
                       <header className="zone-header">
                         <p className="zone-name">{zone}</p>
                         <span className="zone-hint-small">{ZONE_HINT[zone]}</span>
@@ -1043,7 +1052,10 @@ export function App() {
                           e.preventDefault();
                           setDragZone(zone);
                         }}
-                        onDragLeave={() => setDragZone(null)}
+                        onDragLeave={() => {
+                          setDragZone(null);
+                          // Keep isDragging true if we're still dragging, just left the zone
+                        }}
                         onDrop={(ev) => onDropZone(ev, zone)}
                       >
                         {zone}
@@ -1090,7 +1102,10 @@ export function App() {
                       owner="player1"
                       onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedCardId(c.id); }}
                       draggable
-                      onDragStart={(ev) => ev.dataTransfer.setData("text/plain", card.id)}
+                      onDragStart={(ev) => {
+                        setIsDragging(true);
+                        ev.dataTransfer.setData("text/plain", card.id);
+                      }}
                       setRef={setCardRef(`h:${card.id}`)}
                       isPlayable={isPlayable}
                       location="hand"
