@@ -69,6 +69,151 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
 
 **Nächster Schritt:** Öffne [DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md) für die vollständigen Details, oder starte direkt mit Phase 5:
 
+---
+
+## 📋 TODO-Liste - Aktuelle Entwicklung
+
+> **Kontext bewahren:** Alle geplanten Features, Bugs und Verbesserungen zentral gesammelt
+
+### 🔴 Phase 5 - Critical UX Fixes (JETZT)
+
+**User Testing Session 1 - Identifizierte Probleme:**
+
+#### ✅ Abgeschlossen
+- [x] **Game Over Overlay** - Klares Win/Loss-Signal mit Statistiken
+- [x] **Game Over Erklärung** - Deck Empty vs Life Zero besser erklärt
+- [x] **Health Bars für HQs** - Visuelle Anzeige in Topbar
+- [x] **BUG: hasAttackedThisRound** - Hand-Karten zeigten fälschlicherweise "Hat angegriffen"
+- [x] **Playable Card Highlighting** - Grüne Umrandung für spielbare Karten
+
+#### 🔴 Kritisch & Dringend
+- [ ] **Simplify Attack Flow** - Karte anklicken → Attack direkt (Modal entfernen aus Flow)
+  - Problem: Zu viele Klicks (Karte → Modal → Close → Attack Button)
+  - Ziel: Direkter "Attack"-Modus ohne Modal-Umweg
+  
+- [ ] **Board Layout Redesign** - Front links-rechts statt vertikal (GROSSER UMBAU, 1-2 Tage)
+  - Problem: 4 Zonen vermischen sich visuell, Scrollbar erscheint
+  - Ziel: Gegner links, Spieler rechts, 4 Sektionen groß, klare Front-Linie
+  - Details: Siehe [PHASE5_FEEDBACK.md](./PHASE5_FEEDBACK.md) Punkt #3
+
+- [ ] **Block Mechanic UX** - Blocken-Interface klarer gestalten
+  - Problem: "auch das angreifen immernoch kommt das overlay... das capiert keiner"
+  - Ziel: Inline-Block-Selection oder visueller Kampf-Modus
+
+#### ⚠️ Wichtig (Phase 5 Fortsetzung)
+- [ ] **Drag-Drop Visual Feedback** - Drop-Zonen highlighten während Drag
+- [ ] **INSTANT Effect Animations** - Visuelle Effekte bei HEAL/DAMAGE/DRAW
+- [ ] **Combat Animations** - Kampf zwischen Units visualisieren
+
+---
+
+### 🔴 Core Engine - Mechanik-Refactoring
+
+#### 🚨 CRITICAL: Gradual Damage System
+**Status:** Nicht implementiert (aktuelle Engine tötet Units sofort)  
+**Regelwerk-Anforderung:** Units sollten graduell Schaden nehmen (RULES.md)
+
+```
+Aktuell:
+- Units haben nur `power` 
+- Bei Block: Unit stirbt wenn attackerPower >= defenderPower
+- Keine HP-Reduktion, keine Heilung möglich
+
+Regelwerk sagt:
+- Units haben `puste` (Attack) und `panzerung` (HP) getrennt
+- Bei Block: Beide nehmen Schaden, sterben wenn HP <= 0
+- Units heilen NICHT automatisch (korrekt)
+```
+
+**TODO - Implementierung (geschätzt 4-6 Stunden):**
+1. [ ] Backend: `Card` Interface erweitern
+   - `power` → `attack` (Puste) 
+   - Neu: `maxHP` (Panzerung max)
+   - Neu: `currentHP` (aktuelle Panzerung)
+2. [ ] Backend: `block()` Funktion refactorn
+   - Statt Unit töten: `currentHP -= damage`
+   - Beide Units nehmen Schaden
+   - Unit stirbt nur wenn `currentHP <= 0`
+3. [ ] Backend: Alle Cards aktualisieren (`cards.ts`)
+   - Jede Unit braucht Attack + HP statt nur Power
+4. [ ] Frontend: Health Bars auf Units (Board only)
+   - Zeige `currentHP / maxHP` mit Farbcodierung
+   - Grün > 66%, Gelb 33-66%, Rot < 33%
+5. [ ] Tests: Gradual Damage Tests hinzufügen
+   - "attacker takes damage but survives"
+   - "defender takes damage but survives"
+   - "both units die if damage >= HP"
+
+**Abhängigkeiten:** Blockt Health Bar Feature, Healing-Karten würden dann Sinn machen
+
+---
+
+### 🟡 Phase 5 - Polish & Secondary Features
+
+- [ ] **Mulligan-Phase** - Hand-Austausch bei Spielstart (RULES.md 1.2)
+- [ ] **Treibstoff-System ausbauen** - Zone-Movement für Einheiten (RULES.md 2.2)
+- [ ] **Zone-Interaktion** - "Weltall kann von Boden nicht geblockt werden" (RULES.md 3.3)
+- [ ] **Special Abilities** - "Flugabwehr", "Sofort angreifen", etc. (RULES.md 4.4)
+- [ ] **Einheiten-Zustände** - GETAPPT, GELÄHMT, VERSTÄRKT, GEHÄRTET (RULES.md 4.3)
+- [ ] **GLOSSAR.md erstellen** - Terminologie-Referenz für Spieler
+
+---
+
+### 🟢 Phase 6 & Beyond - Content Expansion
+
+**Phase 6 - Content (4-6 Wochen):**
+- [ ] 100+ neue Karten designen (alle Fraktionen)
+- [ ] KI-generiertes Artwork (Midjourney/DALL-E)
+- [ ] Card-Effekte erweitern (mehr als nur HEAL/DAMAGE/DRAW)
+- [ ] Balance-Testing mit größerem Card-Pool
+
+**Phase 7 - Accounts & Monetization (3-4 Wochen):**
+- [ ] User-Account-System (Login, Profil)
+- [ ] Card-Collection (Besitz, Inventar)
+- [ ] In-Game-Currency (verdienen durchs Spielen)
+- [ ] Shop-System (Booster kaufen mit Currency)
+
+**Phase 8 - Game Modes (4-6 Wochen):**
+- [ ] Campaign Mode (10 Boss-Kämpfe)
+- [ ] PvP Matchmaking (Echtzeit oder async)
+- [ ] Ranked Ladder System
+- [ ] Daily Challenges & Events
+
+**Phase 9 - Production (2+ Wochen):**
+- [ ] Server Deployment (DigitalOcean/AWS)
+- [ ] Domain & SSL Setup
+- [ ] Analytics & Monitoring
+- [ ] Discord Community aufsetzen
+
+---
+
+### 🔧 Technische Schulden & Architektur
+
+- [ ] **Persistent Storage** - SQLite Integration (aktuell: in-memory)
+- [ ] **Game State Serialization** - Spiele speichern/laden
+- [ ] **Error Boundaries Frontend** - Graceful Fehlerbehandlung
+- [ ] **API Rate Limiting** - Schutz vor Spam
+- [ ] **TypeScript Strict Mode** - Alle Typen vollständig definieren
+- [ ] **E2E Tests** - Playwright/Cypress für Full-Flow-Tests
+- [ ] **Performance Audit** - Lighthouse Score Optimierung
+- [ ] **Accessibility Audit** - WCAG 2.1 AA Compliance
+
+---
+
+### 📝 Dokumentation
+
+- [ ] **API-Dokumentation** - Swagger/OpenAPI Spec
+- [ ] **Deployment Guide** - Schritt-für-Schritt Production Setup
+- [ ] **CONTRIBUTING.md** - Guidelines für Open Source Contributors
+- [ ] **Database Schema Diagram** - ER-Diagramm für Datenbank
+- [ ] **Architecture Decision Records** - ADRs für wichtige Entscheidungen
+
+---
+
+**Aktueller Fokus:** Phase 5 Critical UX Fixes → Testing (20+ Games) → Phase 6 Content Expansion
+
+Für Details zu Phase 5 User Testing siehe: [PHASE5_FEEDBACK.md](./PHASE5_FEEDBACK.md)
+
 
 ---
 
