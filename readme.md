@@ -91,6 +91,7 @@ Jede Zone erlaubt eigene taktische Entscheidungen bei Aufstellung, Angriff und B
 - [CONCEPT.md](./CONCEPT.md) – Produktvision, Fraktionen, Architektur
 - [RULES.md](./RULES.md) – Vollständiges Regelwerk
 - [CARDS.md](./CARDS.md) – Kartenschema und Designrichtlinien
+- [INSTANT_ABILITY_GUIDE.md](./INSTANT_ABILITY_GUIDE.md) – **INSTANT & ABILITY Karten Guide** ⚡
 - [DEVELOPMENT_ROADMAP.md](./DEVELOPMENT_ROADMAP.md) – **Phases 5-9 mit Details** ⭐
 - `GLOSSAR.md` – wird in Phase 5 erstellt
 - [CHANGELOG.md](./CHANGELOG.md) – v0.1.0-mvp Release Notes

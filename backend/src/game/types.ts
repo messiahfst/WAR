@@ -1,5 +1,13 @@
 export type Zone = "WELTALL" | "LUFT" | "WASSER" | "BODEN";
 
+export type EffectType = "HEAL" | "DRAW" | "DAMAGE" | "BUFF_POWER" | "MUNITION_BOOST";
+
+export interface CardEffect {
+  type: EffectType;
+  value: number;
+  target?: "SELF" | "OPPONENT" | "ALL_UNITS" | "BOARD";
+}
+
 export interface Card {
   id: string;
   name: string;
@@ -8,6 +16,8 @@ export interface Card {
   cost: number;
   power?: number;
   hasAttackedThisRound?: boolean;
+  effect?: CardEffect;
+  description?: string;
 }
 
 export interface PlayerState {

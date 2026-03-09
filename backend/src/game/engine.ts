@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { starterDeck } from "../db/cards.js";
 import { getGame, saveGame } from "./store.js";
-import type { Card, GameState } from "./types.js";
+import type { Card, CardEffect, GameState } from "./types.js";
 
 function drawInitialHand(deck: Card[], size: number): Card[] {
   return deck.slice(0, size);
@@ -19,7 +19,13 @@ function ensureGameActive(state: GameState): void {
 
 function computeMunition(player: GameState["players"][string]): number {
   const resourceCount = player.board.filter((card) => card.type === "RESOURCE").length;
-  return Math.min(10, 3 + resourceCount);
+  
+  // Add ABILITY effects (like Munitionsfabrik giving +1 munition)
+  const abilityBonus = player.board
+    .filter((card) => card.type === "ABILITY" && card.effect?.type === "MUNITION_BOOST")
+    .reduce((sum, card) => sum + (card.effect?.value ?? 0), 0);
+  
+  return Math.min(10, 3 + resourceCount + abilityBonus);
 }
 
 function moveCardFromBoardToDiscard(player: GameState["players"][string], cardId: string): Card | null {
@@ -31,6 +37,58 @@ function moveCardFromBoardToDiscard(player: GameState["players"][string], cardId
   const [card] = player.board.splice(index, 1);
   player.discardPile.push(card);
   return card;
+}
+
+function executeCardEffect(state: GameState, playerId: string, effect: CardEffect): void {
+  const player = state.players[playerId];
+  const opponent = state.players[otherPlayerId(playerId)];
+
+  switch (effect.type) {
+    case "HEAL":
+      if (effect.target === "SELF" || !effect.target) {
+        player.life = Math.min(20, player.life + effect.value);
+      }
+      break;
+
+    case "DAMAGE":
+      if (effect.target === "OPPONENT" || !effect.target) {
+        opponent.life -= effect.value;
+        if (opponent.life <= 0) {
+          state.isGameOver = true;
+          state.winnerId = playerId;
+          state.endReason = "LIFE_ZERO";
+        }
+      }
+      break;
+
+    case "DRAW":
+      for (let i = 0; i < effect.value; i++) {
+        const drawn = player.drawPile.shift();
+        if (drawn) {
+          player.hand.push(drawn);
+        }
+      }
+      break;
+
+    case "MUNITION_BOOST":
+      if (effect.target === "SELF" || !effect.target) {
+        player.munition = Math.min(10, player.munition + effect.value);
+      }
+      break;
+
+    case "BUFF_POWER":
+      if (effect.target === "ALL_UNITS" || effect.target === "BOARD") {
+        player.board.forEach((card) => {
+          if (card.type === "UNIT") {
+            card.power = (card.power ?? 1) + effect.value;
+          }
+        });
+      }
+      break;
+
+    default:
+      break;
+  }
 }
 
 export function createGame(): GameState {
@@ -108,8 +166,22 @@ export function playCard(gameId: string, playerId: string, cardId: string): Game
 
   if (card.type === "UNIT" || card.type === "BUILDING" || card.type === "RESOURCE" || card.type === "ABILITY") {
     player.board.push(card);
+    
+    // Apply ABILITY effects immediately when played (e.g., Kommandozentrale buffing all units)
+    if (card.type === "ABILITY" && card.effect && card.effect.type === "BUFF_POWER" && card.effect.target === "ALL_UNITS") {
+      const buffValue = card.effect.value;
+      player.board.forEach((boardCard) => {
+        if (boardCard.type === "UNIT") {
+          boardCard.power = (boardCard.power ?? 1) + buffValue;
+        }
+      });
+    }
   } else {
     // SPELL, INSTANT, and TECH go to discard (or are resolved)
+    // Execute INSTANT effects immediately
+    if (card.type === "INSTANT" && card.effect) {
+      executeCardEffect(state, playerId, card.effect);
+    }
     player.discardPile.push(card);
   }
 

@@ -5,6 +5,14 @@ import "./styles.css";
 type Zone = "WELTALL" | "LUFT" | "WASSER" | "BODEN";
 type CardType = "UNIT" | "SPELL" | "BUILDING" | "TECH" | "RESOURCE" | "INSTANT" | "ABILITY";
 
+type EffectType = "HEAL" | "DRAW" | "DAMAGE" | "BUFF_POWER" | "MUNITION_BOOST";
+
+type CardEffect = {
+  type: EffectType;
+  value: number;
+  target?: "SELF" | "OPPONENT" | "ALL_UNITS" | "BOARD";
+};
+
 type Card = {
   id: string;
   name: string;
@@ -13,6 +21,8 @@ type Card = {
   cost: number;
   power?: number;
   hasAttackedThisRound?: boolean;
+  effect?: CardEffect;
+  description?: string;
 };
 
 type PlayerState = {
@@ -68,8 +78,8 @@ const CARD_RULES: Record<CardType, string> = {
   BUILDING: "Permanenter Effekt auf dem Board.",
   TECH: "Upgrade fuer Einheiten (MVP spaeter).",
   RESOURCE: "Erhoeht die Munitionsproduktion pro Zug.",
-  INSTANT: "Schneller Effekt - kann zu jeder Zeit gespielt werden.",
-  ABILITY: "Faehigkeit - aktivierbarer permanenter Effekt."
+  INSTANT: "Sofortiger Effekt - wirkt beim Spielen, geht dann ins Discard.",
+  ABILITY: "Faehigkeit - permanenter Effekt solange auf dem Board."
 };
 
 const api = {
@@ -172,6 +182,17 @@ function CardDetailModal(props: {
           <div className="detail-section">
             <h3>Fähigkeit</h3>
             <p className="rule-text">{CARD_RULES[card.type]}</p>
+            {card.description && (
+              <>
+                <h4 style={{marginTop: "0.5rem", fontSize: "0.9rem"}}>Effekt</h4>
+                <p className="effect-text" style={{color: "#4fc3f7", fontWeight: "bold"}}>{card.description}</p>
+              </>
+            )}
+            {card.effect && (
+              <div style={{marginTop: "0.5rem", fontSize: "0.85rem", color: "#999"}}>
+                <strong>Effekt-Details:</strong> {card.effect.type} ({card.effect.value} Wert)
+              </div>
+            )}
           </div>
         </div>
         {canPlay && onPlay && (
