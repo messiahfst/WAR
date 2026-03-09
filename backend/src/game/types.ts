@@ -33,10 +33,12 @@ export interface PlayerState {
 export interface GameState {
   gameId: string;
   turn: number;
-  phase: "PRODUCTION" | "MAIN" | "COMBAT" | "END";
+  phase: "PRODUCTION" | "MAIN" | "COMBAT" | "DEFENDER_CHOOSES" | "COMBAT_RESOLVE" | "END";
   activePlayerId: string;
   players: Record<string, PlayerState>;
   winnerId: string | null;
   isGameOver: boolean;
   endReason: "LIFE_ZERO" | "DECK_EMPTY" | null;
+  pendingAttacks?: Array<{ attackerId: string; targetPlayerId: string }>;
+  declaredBlockers?: Record<string, string>;
 }

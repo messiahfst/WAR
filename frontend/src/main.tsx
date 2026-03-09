@@ -213,6 +213,14 @@ const api = {
     });
     return (await r.json()) as GameState | { error: string };
   },
+  async declareBlock(gameId: string, playerId: string, attackerCardId: string, defenderCardId: string) {
+    const r = await fetch(`http://localhost:3000/api/game/${gameId}/declare-block`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ playerId, attackerCardId, defenderCardId })
+    });
+    return (await r.json()) as GameState | { error: string };
+  },
   async endTurn(gameId: string, playerId: string) {
     const r = await fetch(`http://localhost:3000/api/game/${gameId}/end-turn`, {
       method: "POST",
@@ -309,6 +317,100 @@ function CardDetailModal(props: {
   );
 }
 
+function BlockModal(props: {
+  pendingAttacks: Array<{ attackerId: string; targetPlayerId: string }> | undefined;
+  gameState: GameState;
+  declaredBlockers: Record<string, string>;
+  onBlockDeclare: (attackerCardId: string, defenderCardId: string) => Promise<void>;
+  onBlocksComplete: () => Promise<void>;
+  busy: boolean;
+}) {
+  const { pendingAttacks, gameState, declaredBlockers, onBlockDeclare, onBlocksComplete, busy } = props;
+  
+  if (!pendingAttacks || pendingAttacks.length === 0) {
+    return null;
+  }
+
+  const defendingPlayer = gameState.players.player1;
+  const attackingPlayer = gameState.players.player2;
+  const allAttacksBlocked = pendingAttacks.every(att => declaredBlockers[att.attackerId]);
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 1000 }}>
+      <div className="modal">
+        <button className="modal-close" onClick={onBlocksComplete}>✕</button>
+        <h2>🛡️ Angriff abwehren!</h2>
+        <p style={{ color: "#f0ad4e", marginBottom: "1rem" }}>
+          Der Gegner greift mit {pendingAttacks.length} Einheit{pendingAttacks.length > 1 ? "en" : ""} an!
+        </p>
+
+        <div style={{ marginBottom: "1.5rem", maxHeight: "400px", overflowY: "auto" }}>
+          {pendingAttacks.map((attack) => {
+            const attacker = attackingPlayer.board.find(c => c.id === attack.attackerId);
+            const isBlocked = !!declaredBlockers[attack.attackerId];
+            const blockerCard = isBlocked ? defendingPlayer.board.find(c => c.id === declaredBlockers[attack.attackerId]) : null;
+
+            return (
+              <div key={attack.attackerId} style={{
+                padding: "1rem",
+                marginBottom: "0.75rem",
+                border: `2px solid ${isBlocked ? "#28a745" : "#dc3545"}`,
+                borderRadius: "4px",
+                background: isBlocked ? "rgba(40,167,69,0.1)" : "rgba(220,53,69,0.1)"
+              }}>
+                <p style={{ marginTop: 0 }}>
+                  <strong>⚔️ {attacker?.name ?? "Unknown"}</strong> ({attacker?.power ?? 1} Puste)
+                </p>
+                {isBlocked ? (
+                  <p style={{ color: "#28a745", marginBottom: 0 }}>
+                    ✓ Blockiert von <strong>{blockerCard?.name}</strong> ({blockerCard?.power ?? 1} Puste)
+                  </p>
+                ) : (
+                  <>
+                    <p style={{ marginBottom: "0.5rem", fontSize: "0.9em" }}>Wähle einen Blocker:</p>
+                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                      {defendingPlayer.board.filter(c => c.type === "UNIT").map(defender => (
+                        <button
+                          key={defender.id}
+                          onClick={() => onBlockDeclare(attack.attackerId, defender.id)}
+                          disabled={busy}
+                          style={{
+                            padding: "0.5rem 0.75rem",
+                            background: "#0066cc",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "3px",
+                            cursor: busy ? "not-allowed" : "pointer",
+                            opacity: busy ? 0.6 : 1,
+                            fontSize: "0.85em"
+                          }}
+                        >
+                          {defender.name} ({defender.power ?? 1})
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="modal-actions">
+          <button 
+            className="primary" 
+            onClick={onBlocksComplete}
+            disabled={busy || !allAttacksBlocked}
+            title={!allAttacksBlocked ? "Alle Angriffe müssen blockiert sein" : ""}
+          >
+            Blockieren abschließen
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function CardTile(props: {
   card: Card;
@@ -377,6 +479,8 @@ export function App() {
   const [trailLabel, setTrailLabel] = useState<string>("Combat-Trail bereit");
   const [detailCard, setDetailCard] = useState<Card | null>(null);
   const [detailCardOwner, setDetailCardOwner] = useState<"player1" | "player2" | null>(null);
+  const [blockingAttackerId, setBlockingAttackerId] = useState<string | null>(null);
+  const [declaredBlockers, setDeclaredBlockers] = useState<Record<string, string>>({});
 
   const boardRef = useRef<HTMLDivElement | null>(null);
   const enemyHqRef = useRef<HTMLDivElement | null>(null);
@@ -530,8 +634,62 @@ export function App() {
 
       setState(res);
       addLog(`Du greifst mit ${attacker.name} an.`);
-      await showTrail(`p1:${attacker.id}`, "anchor:enemyHQ", "ATTACK", `ATTACK: ${attacker.name} -> Gegner-HQ`);
+      await showTrail(`p1:${attacker.id}`, "anchor:enemyHQ", "ATTACK", `ATTACK: ${attacker.name} greift an...`);
       await flashCard(attackerCardId);
+      if (res.isGameOver) {
+        addLog(`Match beendet: ${res.endReason}`);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const blockDeclare = async (attackerCardId: string, defenderCardId: string) => {
+    if (!state || busy) {
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await api.declareBlock(state.gameId, "player1", attackerCardId, defenderCardId);
+      if (isError(res)) {
+        addLog(`Block fehlgeschlagen: ${res.error}`);
+        return;
+      }
+
+      const atkCard = enemy?.board.find((c) => c.id === attackerCardId);
+      const defCard = player?.board.find((c) => c.id === defenderCardId);
+      addLog(`${defCard?.name} blockt ${atkCard?.name}`);
+      await flashCard(defenderCardId);
+      
+      // Update local state
+      setDeclaredBlockers(prev => ({
+        ...prev,
+        [attackerCardId]: defenderCardId
+      }));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const completeBlocks = async () => {
+    if (!state || busy) {
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await api.endTurn(state.gameId, "player1");
+      if (isError(res)) {
+        addLog(`Blockphase beendet - Fehler: ${res.error}`);
+        return;
+      }
+
+      setState(res);
+      addLog("Angriff abgewickelt.");
+      setDeclaredBlockers({});
+      await delay(500);
+      
       if (res.isGameOver) {
         addLog(`Match beendet: ${res.endReason}`);
       }
@@ -886,6 +1044,16 @@ export function App() {
       {desktopWarning}
       {state?.isGameOver && (
         <GameOverModal state={state} onNewGame={newGame} />
+      )}
+      {state?.pendingAttacks && state.pendingAttacks.length > 0 && state.activePlayerId === "player2" && (
+        <BlockModal
+          pendingAttacks={state.pendingAttacks}
+          gameState={state}
+          declaredBlockers={declaredBlockers}
+          onBlockDeclare={blockDeclare}
+          onBlocksComplete={completeBlocks}
+          busy={busy}
+        />
       )}
       <CardDetailModal
         card={detailCard}

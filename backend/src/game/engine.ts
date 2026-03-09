@@ -200,6 +200,12 @@ export function endTurn(gameId: string, playerId: string): GameState {
     throw new Error("Not your turn");
   }
 
+  // If there are pending attacks, resolve them first
+  if (state.pendingAttacks && state.pendingAttacks.length > 0) {
+    // This resolves combats with declared blocks, and unblocked attacks go to opponent's HQ
+    return resolvePendingAttacks(gameId, playerId);
+  }
+
   const nextPlayerId = otherPlayerId(playerId);
   const nextPlayer = state.players[nextPlayerId];
 
@@ -244,7 +250,6 @@ export function attack(gameId: string, playerId: string, attackerCardId: string)
     throw new Error("Not your turn");
   }
 
-  state.phase = "COMBAT";
   const attackerOwner = state.players[playerId];
   const attacker = attackerOwner.board.find((card) => card.id === attackerCardId);
   if (!attacker || attacker.type !== "UNIT") {
@@ -255,27 +260,24 @@ export function attack(gameId: string, playerId: string, attackerCardId: string)
     throw new Error("This unit has already attacked this round");
   }
 
-  const defender = state.players[otherPlayerId(playerId)];
-  defender.life -= attacker.power ?? 1;
-
-  // Mark card as having attacked
-  attacker.hasAttackedThisRound = true;
-
-  if (defender.life <= 0) {
-    state.phase = "END";
-    state.isGameOver = true;
-    state.winnerId = playerId;
-    state.endReason = "LIFE_ZERO";
-    saveGame(state);
-    return state;
+  // Add to pending attacks list
+  if (!state.pendingAttacks) {
+    state.pendingAttacks = [];
   }
+  state.pendingAttacks.push({
+    attackerId: attackerCardId,
+    targetPlayerId: otherPlayerId(playerId),
+  });
 
-  state.phase = "MAIN";
+  // Mark unit as attacked
+  attacker.hasAttackedThisRound = true;
+  state.phase = "DEFENDER_CHOOSES";
+
   saveGame(state);
   return state;
 }
 
-export function block(
+export function declareBlock(
   gameId: string,
   playerId: string,
   attackerCardId: string,
@@ -291,6 +293,10 @@ export function block(
     throw new Error("Blocking player must be the defender");
   }
 
+  if (!state.pendingAttacks || state.pendingAttacks.length === 0) {
+    throw new Error("No pending attacks to block");
+  }
+
   const attackerOwner = state.players[state.activePlayerId];
   const defenderOwner = state.players[playerId];
 
@@ -304,20 +310,79 @@ export function block(
     throw new Error("Defender not found on defender board or not a unit");
   }
 
-  state.phase = "COMBAT";
+  // Store block declaration
+  if (!state.declaredBlockers) {
+    state.declaredBlockers = {};
+  }
+  state.declaredBlockers[attackerCardId] = defenderCardId;
 
-  const attackerPower = attacker.power ?? 1;
-  const defenderPower = defender.power ?? 1;
+  saveGame(state);
+  return state;
+}
 
-  if (attackerPower >= defenderPower) {
-    moveCardFromBoardToDiscard(defenderOwner, defenderCardId);
+export function resolvePendingAttacks(gameId: string, playerId: string): GameState {
+  const state = getGame(gameId);
+  if (!state) {
+    throw new Error("Game not found");
+  }
+  ensureGameActive(state);
+
+  if (state.activePlayerId !== playerId) {
+    throw new Error("Not your turn");
   }
 
-  if (defenderPower >= attackerPower) {
-    moveCardFromBoardToDiscard(attackerOwner, attackerCardId);
+  if (!state.pendingAttacks || state.pendingAttacks.length === 0) {
+    throw new Error("No pending attacks to resolve");
+  }
+
+  const declaredBlockers = state.declaredBlockers || {};
+  const attacker = state.players[playerId];
+  const defender = state.players[otherPlayerId(playerId)];
+
+  // Resolve each attack
+  for (const attack of state.pendingAttacks) {
+    const attackerCard = attacker.board.find((c) => c.id === attack.attackerId);
+    if (!attackerCard) continue;
+
+    const blockerCardId = declaredBlockers[attack.attackerId];
+    
+    if (blockerCardId) {
+      // Combat between units
+      const blockerCard = defender.board.find((c) => c.id === blockerCardId);
+      if (blockerCard) {
+        const attackerPower = attackerCard.power ?? 1;
+        const blockerPower = blockerCard.power ?? 1;
+
+        if (attackerPower >= blockerPower) {
+          moveCardFromBoardToDiscard(defender, blockerCardId);
+        }
+        if (blockerPower >= attackerPower) {
+          moveCardFromBoardToDiscard(attacker, attack.attackerId);
+        }
+      }
+    } else {
+      // No block declared - direct damage to opponent HQ
+      const attackerPower = attackerCard.power ?? 1;
+      defender.life -= attackerPower;
+    }
+  }
+
+  // Clear pending attacks
+  state.pendingAttacks = [];
+  state.declaredBlockers = {};
+
+  // Check for game over
+  if (defender.life <= 0) {
+    state.phase = "END";
+    state.isGameOver = true;
+    state.winnerId = playerId;
+    state.endReason = "LIFE_ZERO";
+    saveGame(state);
+    return state;
   }
 
   state.phase = "MAIN";
   saveGame(state);
   return state;
 }
+

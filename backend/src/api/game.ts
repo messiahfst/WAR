@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { attack, block, createGame, endTurn, getState, playCard } from "../game/engine.js";
+import { attack, declareBlock, createGame, endTurn, getState, playCard } from "../game/engine.js";
 
 export const gameRouter = Router();
 
@@ -67,6 +67,27 @@ gameRouter.post("/:gameId/attack", (req, res) => {
   }
 });
 
+gameRouter.post("/:gameId/declare-block", (req, res) => {
+  const { playerId, attackerCardId, defenderCardId } = req.body as {
+    playerId?: string;
+    attackerCardId?: string;
+    defenderCardId?: string;
+  };
+
+  if (!playerId || !attackerCardId || !defenderCardId) {
+    res.status(400).json({ error: "playerId, attackerCardId and defenderCardId are required" });
+    return;
+  }
+
+  try {
+    const state = declareBlock(req.params.gameId, playerId, attackerCardId, defenderCardId);
+    res.json(state);
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+// Legacy endpoint for backward compatibility
 gameRouter.post("/:gameId/block", (req, res) => {
   const { playerId, attackerCardId, defenderCardId } = req.body as {
     playerId?: string;
@@ -80,7 +101,7 @@ gameRouter.post("/:gameId/block", (req, res) => {
   }
 
   try {
-    const state = block(req.params.gameId, playerId, attackerCardId, defenderCardId);
+    const state = declareBlock(req.params.gameId, playerId, attackerCardId, defenderCardId);
     res.json(state);
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
