@@ -33,7 +33,11 @@ WAR ist kostenlos, Open-Source, und wird durch **saubere Monetarisierung** (In-G
    - All tests passing ✅
 
 ### JETZT (Diese Woche - TESTING PHASE)
-1. **Du testest das Spiel vollständig** (20+ Matches spielen)
+1. **Welcome Screen/Main Menu testen**
+  - Theme-Song nur im Menü
+  - Musik Ein/Aus + Lautstärke-Regler validieren
+  - Übergang Menü -> Spiel ohne Musik-Leak prüfen
+2. **Du testest das Spiel vollständig** (20+ Matches spielen)
    - Spielfeeling mit neuem Damage-System
    - Balance-Check: Sind Units zu stark/schwach?
    - Dokumentiere Bugs, UX-Issues, Balance-Probleme

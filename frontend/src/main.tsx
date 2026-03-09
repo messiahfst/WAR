@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -507,6 +507,7 @@ function CardTile(props: {
 
 export function App() {
   const [state, setState] = useState<GameState | null>(null);
+  const [screen, setScreen] = useState<"menu" | "game">("menu");
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedAttackerId, setSelectedAttackerId] = useState<string | null>(null);
   const [selectedDefenderId, setSelectedDefenderId] = useState<string | null>(null);
@@ -525,11 +526,14 @@ export function App() {
   const [declaredBlockers, setDeclaredBlockers] = useState<Record<string, string>>({});
   const [healEffect, setHealEffect] = useState(false);
   const [damageEffect, setDamageEffect] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
+  const [musicVolume, setMusicVolume] = useState(60);
 
   const boardRef = useRef<HTMLDivElement | null>(null);
   const enemyHqRef = useRef<HTMLDivElement | null>(null);
   const playerHqRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<string, HTMLElement | null>>({});
+  const menuAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const player = state?.players.player1;
   const enemy = state?.players.player2;
@@ -539,6 +543,25 @@ export function App() {
   const selectedAttacker = useMemo(() => player?.board.find((c) => c.id === selectedAttackerId) ?? null, [player, selectedAttackerId]);
 
   const addLog = (msg: string) => setLog((prev) => [`${new Date().toLocaleTimeString()} - ${msg}`, ...prev].slice(0, 50));
+
+  useEffect(() => {
+    const audio = menuAudioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    audio.volume = Math.max(0, Math.min(1, musicVolume / 100));
+
+    if (screen === "menu" && musicEnabled) {
+      void audio.play().catch(() => {
+        // Browser autoplay policies can block this until user interaction.
+      });
+      return;
+    }
+
+    audio.pause();
+    audio.currentTime = 0;
+  }, [screen, musicEnabled, musicVolume]);
 
   const flashCard = async (cardId: string) => {
     setAnimatingCardIds((prev) => [...prev, cardId]);
@@ -611,7 +634,7 @@ export function App() {
     return s;
   };
 
-  const newGame = async () => {
+  const newGame = async (): Promise<boolean> => {
     setBusy(true);
     try {
       const created = await api.createGame();
@@ -625,8 +648,34 @@ export function App() {
       setDrawingCardIds([]);
       setHealEffect(false);
       setDamageEffect(false);
+      return true;
+    } catch (err) {
+      addLog(`Neues Match fehlgeschlagen: ${err instanceof Error ? err.message : "Unbekannter Fehler"}`);
+      return false;
     } finally {
       setBusy(false);
+    }
+  };
+
+  const startFromMenu = async () => {
+    const ok = await newGame();
+    if (ok) {
+      setScreen("game");
+    }
+  };
+
+  const toggleMenuMusic = async () => {
+    const audio = menuAudioRef.current;
+    const next = !musicEnabled;
+    setMusicEnabled(next);
+
+    if (audio && next && screen === "menu") {
+      audio.volume = Math.max(0, Math.min(1, musicVolume / 100));
+      try {
+        await audio.play();
+      } catch {
+        addLog("Browser blockiert Autoplay. Klicke erneut auf Musik An.");
+      }
     }
   };
 
@@ -966,8 +1015,54 @@ export function App() {
     </section>
   );
 
+  const menuView = (
+    <main className="menu-screen">
+      <div className="menu-backdrop" aria-hidden="true" />
+      <section className="menu-card">
+        <img src="/WAR.png" alt="WAR Logo" className="menu-logo" />
+        <h1>WAR</h1>
+        <p className="menu-subtitle">Strategic Card Warfare</p>
+
+        <div className="menu-actions">
+          <button className="primary large" onClick={startFromMenu} disabled={busy}>
+            Neues Spiel
+          </button>
+          {state ? (
+            <button onClick={() => setScreen("game")} disabled={busy}>
+              Spiel fortsetzen
+            </button>
+          ) : null}
+        </div>
+
+        <div className="menu-settings">
+          <p className="section-title">Einstellungen</p>
+          <div className="menu-setting-row">
+            <span>Musik</span>
+            <button onClick={toggleMenuMusic}>{musicEnabled ? "An" : "Aus"}</button>
+          </div>
+          <div className="menu-setting-row">
+            <span>Lautstärke</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={musicVolume}
+              onChange={(e) => setMusicVolume(Number(e.target.value))}
+              disabled={!musicEnabled}
+            />
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+
   return (
     <>
+      <audio ref={menuAudioRef} src="/WAR - Main Theme - Stahlgrauer Morgen.mp3" loop preload="auto" />
+      {screen === "menu" ? (
+        menuView
+      ) : (
+        <>
       <main className="app">
         <header className="topbar">
           <div className="brand">
@@ -1216,6 +1311,11 @@ export function App() {
         onClose={() => { setDetailCard(null); setDetailCardOwner(null); }}
         onPlay={selectedCardId ? () => { playCard(selectedCardId, "button"); setDetailCard(null); setDetailCardOwner(null); } : undefined}
       />
+      <button className="menu-open-btn" onClick={() => setScreen("menu")}>
+        Hauptmenü
+      </button>
+      </>
+      )}
     </>
   );
 }

@@ -2,8 +2,8 @@
 
 > Ein **kostenloses**, **Open-Source** Sammelkartenspiel mit Kriegs-Setting, 4-Zonen-Taktik, fairem Sammelsystem und PvP/PvE Modi.
 
-**Status:** v0.1.0-mvp (Core Mechanics Live)  
-**Phase:** 🔄 Phase 5 – Umfassendes Testing (Fred testet aktuell)  
+**Status:** v0.1.1 (Phase 5 Complete)  
+**Phase:** ✅ Phase 5 Complete - All 10 Features Implemented  
 **Next Phase:** Phase 6 – Content & Artwork Expansion
 
 ---
@@ -32,8 +32,8 @@ npm run lint
 
 ---
 
-✅ **Was funktioniert:** Core Game, Attack/Block System, Card Details, UX verbessert  
-⏳ **Was kommt:** INSTANT Animations, Drag-Drop Feedback, Gradual Damage System, 150+ Karten
+✅ **Was funktioniert:** Core Game, Attack/Block System, Gradual Damage System, INSTANT Animations, Drag-Drop, Health Bars  
+⏳ **Was kommt:** 150+ Karten, Campaign Mode, PvP System
 
 **Detaillierter Plan:** Siehe [DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md)
 
@@ -61,7 +61,7 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
 
 | Phase | Status | Timeline | Fokus |
 |-------|--------|----------|-------|
-| **5** | ⏳ NEXT | 2-3 Wochen | Testing & User Feedback (Fred plays 20+ games) |
+| **5** | ✅ DONE | Completed | All 10 Features Implemented & Tested |
 | **6** | ⏳ PLANNED | 4-6 Wochen | Content Expansion (100+ Cards + Artwork) |
 | **7** | ⏳ PLANNED | 3-4 Wochen | Monetization & Account System |
 | **8** | ⏳ PLANNED | 4-6 Wochen | Game Modes (Campaign, PvP, Events) |
@@ -95,48 +95,32 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
   - Drop-Zonen glühen/pulsieren während Card-Drag
   - Inaktive Zonen werden gedimmt bei Drag
   - Klare visuelle Unterscheidung Valid/Hover-Zonen
-- [x] **Gradual Damage System** - ✅ Implementiert (Option 4):
-  - Units haben jetzt separate `attack` (Puste) und `maxHP` (Panzerung) Stats
-  - Combat: Beide Units nehmen Schaden gleich dem Attack des Gegners
-  - Units sterben nur wenn `currentHP <= 0` (statt sofort bei Power-Vergleich)
-  - Health Bars auf Board-Einheiten mit Farb-Skalierung (Grün → Gelb → Rot)
-  - Backend completly refactored für Damage-Accumulation
+- [x] **Gradual Damage System** - ✅ Implementiert (Option 4) - siehe Details unten
 
 ---
 
-### ✅ Core Engine - Gradual Damage System
+### ✅ Gradual Damage System (Option 4) - Vollständig Implementiert
 
-#### ✅ IMPLEMENTIERT: Gradual Damage System (Option 4)
-**Status:** Vollständig implementiert und getestet  
-**Commit:** 31e31c5 (feat: implement gradual damage system)
+**Status:** Phase 5 Feature Complete  
+**Commits:** 31e31c5 + 8cafefc + 5980693
 
-**Änderungen:**
-```
-Vorher:
-- Units haben nur `power` Stat
-- Bei Block: Unit stirbt wenn attackerPower >= defenderPower
-- Keine HP-Reduktion, Heilung unmöglich
-
-Nachher:
-- Units haben `attack` (Puste) + `maxHP` (Panzerung)
-- Units tracken `currentHP` während Board
-- Bei Block: attackerCard.currentHP -= blockerCard.attack
-- Beide Units nehmen Schaden, sterben bei HP <= 0
-- Healing würde jetzt funktionieren (wenn implementiert)
-```
-
-**Implementierte Features:**
-1. ✅ Backend: Card Interface erweitert (attack, maxHP, currentHP)
-2. ✅ Backend: Combat-Logik refaktoriert für Damage-Accumulation
-3. ✅ Backend: Alle Starter-Deck Cards mit Attack + HP aktualisiert
-4. ✅ Frontend: Health Bar auf Board-Units mit Farbcodierung
-5. ✅ Frontend: Card Type aktualisiert für neue Stats
-6. ✅ Tests: Alle 10 Tests bestehen (kein Regressionen)
+**Was sich ändert:** 
+- Units haben `attack` (Puste) + `maxHP` (Panzerung) statt nur `power`
+- Bei Block: Beide nehmen Schaden (nicht sofort tot)
+- Units sterben nur wenn `currentHP ≤ 0`
+- Health Bars auf Board zeigen Farb-Skalierung (Grün → Gelb → Rot)
+- Backend komplett refactored für Damage-Accumulation
+- **Alle 10 Tests passing** ✅
 
 ---
 
 ### 🟡 Phase 5 - Polish & Secondary Features
 
+- [x] **Welcome Screen / Main Menu** - Hauptmenü mit "Neues Spiel" und "Spiel fortsetzen"
+  - Spieltitel und Logo
+  - Theme-Song läuft **nur** im Hauptmenü
+  - Erste Einstellung: Musik **Ein/Aus** + Lautstärke-Regler
+  - Beim Wechsel ins Spiel stoppt die Menü-Musik automatisch
 - [ ] **Mulligan-Phase** - Hand-Austausch bei Spielstart (RULES.md 1.2)
 - [ ] **Treibstoff-System ausbauen** - Zone-Movement für Einheiten (RULES.md 2.2)
 - [ ] **Zone-Interaktion** - "Weltall kann von Boden nicht geblockt werden" (RULES.md 3.3)
@@ -146,7 +130,7 @@ Nachher:
 
 ---
 
-### 🟢 Phase 6 & Beyond - Content Expansion
+### � Phase 6 & Beyond - Content Expansion
 
 **Phase 6 - Content (4-6 Wochen):**
 - [ ] 100+ neue Karten designen (alle Fraktionen)
