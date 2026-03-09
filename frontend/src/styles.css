@@ -86,6 +86,19 @@
   flex-wrap: wrap;
 }
 
+.menu-mulligan-info {
+  border: 1px solid #3b4a68;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.7rem 0.8rem;
+}
+
+.menu-mulligan-info p {
+  margin: 0.15rem 0;
+  color: #d6e2f8;
+  font-size: 0.9rem;
+}
+
 .menu-settings {
   border: 1px solid #2f3a51;
   border-radius: 12px;

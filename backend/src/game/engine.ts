@@ -7,6 +7,15 @@ function drawInitialHand(deck: Card[], size: number): Card[] {
   return deck.slice(0, size);
 }
 
+function shuffleCards(cards: Card[]): Card[] {
+  const arr = [...cards];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function otherPlayerId(playerId: string): string {
   return playerId === "player1" ? "player2" : "player1";
 }
@@ -110,6 +119,8 @@ export function createGame(): GameState {
         id: "player1",
         life: 20,
         munition: 3,
+        mulligansUsed: 0,
+        canMulligan: true,
         hand: p1Hand,
         board: [],
         drawPile: p1Deck.slice(5),
@@ -119,6 +130,8 @@ export function createGame(): GameState {
         id: "player2",
         life: 20,
         munition: 3,
+        mulligansUsed: 0,
+        canMulligan: true,
         hand: p2Hand,
         board: [],
         drawPile: p2Deck.slice(5),
@@ -129,6 +142,44 @@ export function createGame(): GameState {
 
   saveGame(game);
   return game;
+}
+
+export function mulligan(gameId: string, playerId: string): GameState {
+  const state = getGame(gameId);
+  if (!state) {
+    throw new Error("Game not found");
+  }
+  ensureGameActive(state);
+
+  const player = state.players[playerId];
+  if (!player) {
+    throw new Error("Player not found");
+  }
+
+  if (!player.canMulligan) {
+    throw new Error("Mulligan phase is over");
+  }
+
+  const used = player.mulligansUsed ?? 0;
+  if (used >= 2) {
+    throw new Error("Maximum mulligans reached");
+  }
+
+  // Only allow mulligan at match start before any board/discard progress.
+  if (state.turn !== 1 || player.board.length > 0 || player.discardPile.length > 0) {
+    throw new Error("Mulligan is only allowed at game start");
+  }
+
+  const nextUsed = used + 1;
+  const nextHandSize = Math.max(1, 5 - nextUsed);
+  const refreshedPile = shuffleCards([...player.hand, ...player.drawPile]);
+
+  player.mulligansUsed = nextUsed;
+  player.hand = refreshedPile.slice(0, nextHandSize);
+  player.drawPile = refreshedPile.slice(nextHandSize);
+
+  saveGame(state);
+  return state;
 }
 
 export function getState(gameId: string): GameState | undefined {

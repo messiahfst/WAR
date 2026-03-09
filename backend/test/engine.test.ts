@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGame, endTurn, getState, playCard } from "../src/game/engine.js";
+import { createGame, endTurn, getState, mulligan, playCard } from "../src/game/engine.js";
 
 describe("engine", () => {
   it("switches active player and increments turn on end turn", () => {
@@ -171,5 +171,17 @@ describe("engine", () => {
 
     // Should be 3 (base) + 1 (ability) = 4
     expect(afterEndTurn.players.player2.munition).toBe(4);
+  });
+
+  it("applies mulligan at game start with reduced hand size", () => {
+    const game = createGame();
+
+    const afterFirst = mulligan(game.gameId, "player1");
+    expect(afterFirst.players.player1.hand.length).toBe(4);
+    expect(afterFirst.players.player1.mulligansUsed).toBe(1);
+
+    const afterSecond = mulligan(game.gameId, "player1");
+    expect(afterSecond.players.player1.hand.length).toBe(3);
+    expect(afterSecond.players.player1.mulligansUsed).toBe(2);
   });
 });

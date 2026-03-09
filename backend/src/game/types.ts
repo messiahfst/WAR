@@ -26,6 +26,8 @@ export interface PlayerState {
   id: string;
   life: number;
   munition: number;
+  mulligansUsed?: number;
+  canMulligan?: boolean;
   hand: Card[];
   board: Card[];
   drawPile: Card[];

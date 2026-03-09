@@ -31,6 +31,8 @@ type PlayerState = {
   id: string;
   life: number;
   munition: number;
+  mulligansUsed?: number;
+  canMulligan?: boolean;
   hand: Card[];
   board: Card[];
   drawPile: Card[];
@@ -40,7 +42,7 @@ type PlayerState = {
 type GameState = {
   gameId: string;
   turn: number;
-  phase: "PRODUCTION" | "MAIN" | "COMBAT" | "END";
+  phase: "PRODUCTION" | "MAIN" | "COMBAT" | "DEFENDER_CHOOSES" | "COMBAT_RESOLVE" | "END";
   activePlayerId: "player1" | "player2";
   players: Record<"player1" | "player2", PlayerState>;
   winnerId: "player1" | "player2" | null;
@@ -234,6 +236,14 @@ const api = {
   },
   async endTurn(gameId: string, playerId: string) {
     const r = await fetch(`http://localhost:3000/api/game/${gameId}/end-turn`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ playerId })
+    });
+    return (await r.json()) as GameState | { error: string };
+  },
+  async mulligan(gameId: string, playerId: string) {
+    const r = await fetch(`http://localhost:3000/api/game/${gameId}/mulligan`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ playerId })
@@ -508,6 +518,7 @@ function CardTile(props: {
 export function App() {
   const [state, setState] = useState<GameState | null>(null);
   const [screen, setScreen] = useState<"menu" | "game">("menu");
+  const [inMulliganPhase, setInMulliganPhase] = useState(false);
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedAttackerId, setSelectedAttackerId] = useState<string | null>(null);
   const [selectedDefenderId, setSelectedDefenderId] = useState<string | null>(null);
@@ -658,9 +669,46 @@ export function App() {
   };
 
   const startFromMenu = async () => {
-    const ok = await newGame();
-    if (ok) {
+    if (!state) {
+      const ok = await newGame();
+      if (ok) {
+        setInMulliganPhase(true);
+      }
+      return;
+    }
+
+    if (inMulliganPhase) {
+      setInMulliganPhase(false);
+      addLog("Mulligan abgeschlossen. Match startet.");
       setScreen("game");
+      return;
+    }
+
+    setScreen("game");
+  };
+
+  const applyMulligan = async () => {
+    if (!state || busy || !inMulliganPhase) {
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await api.mulligan(state.gameId, "player1");
+      if (isError(res)) {
+        addLog(`Mulligan fehlgeschlagen: ${res.error}`);
+        return;
+      }
+
+      setState(res);
+      const used = res.players.player1.mulligansUsed ?? 0;
+      addLog(`Mulligan #${used} angewendet. Neue Hand: ${res.players.player1.hand.length} Karten.`);
+
+      if (used >= 2) {
+        setInMulliganPhase(false);
+      }
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -1024,10 +1072,23 @@ export function App() {
           <h1>WAR</h1>
           <p className="menu-subtitle">Strategic Card Warfare</p>
 
+          {state && inMulliganPhase ? (
+            <div className="menu-mulligan-info">
+              <p><strong>Mulligan-Phase</strong></p>
+              <p>Handkarten: {state.players.player1.hand.length}</p>
+              <p>Verwendet: {state.players.player1.mulligansUsed ?? 0} / 2</p>
+            </div>
+          ) : null}
+
           <div className="menu-actions">
             <button className="primary large" onClick={startFromMenu} disabled={busy}>
-              Neues Spiel
+              {!state ? "Neues Spiel" : inMulliganPhase ? "Hand behalten & Starten" : "Spiel starten"}
             </button>
+            {state && inMulliganPhase ? (
+              <button onClick={applyMulligan} disabled={busy || (state.players.player1.mulligansUsed ?? 0) >= 2}>
+                Mulligan ({Math.max(0, 2 - (state.players.player1.mulligansUsed ?? 0))} übrig)
+              </button>
+            ) : null}
             {state ? (
               <button onClick={() => setScreen("game")} disabled={busy}>
                 Spiel fortsetzen

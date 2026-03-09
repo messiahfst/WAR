@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { attack, declareBlock, createGame, endTurn, getState, playCard } from "../game/engine.js";
+import { attack, declareBlock, createGame, endTurn, getState, mulligan, playCard } from "../game/engine.js";
 
 export const gameRouter = Router();
 
@@ -42,6 +42,21 @@ gameRouter.post("/:gameId/end-turn", (req, res) => {
 
   try {
     const state = endTurn(req.params.gameId, playerId);
+    res.json(state);
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+gameRouter.post("/:gameId/mulligan", (req, res) => {
+  const { playerId } = req.body as { playerId?: string };
+  if (!playerId) {
+    res.status(400).json({ error: "playerId is required" });
+    return;
+  }
+
+  try {
+    const state = mulligan(req.params.gameId, playerId);
     res.json(state);
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });

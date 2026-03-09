@@ -53,4 +53,21 @@ describe("game api", () => {
 
     expect(afterEnd.body.activePlayerId).toBe("player2");
   });
+
+  it("applies mulligan and reduces opening hand size", async () => {
+    const app = createApp();
+    const created = await request(app).post("/api/game/create");
+    const gameId = created.body.gameId as string;
+
+    const before = await request(app).get(`/api/game/${gameId}/state`).expect(200);
+    expect(before.body.players.player1.hand.length).toBe(5);
+
+    const after = await request(app)
+      .post(`/api/game/${gameId}/mulligan`)
+      .send({ playerId: "player1" })
+      .expect(200);
+
+    expect(after.body.players.player1.hand.length).toBe(4);
+    expect(after.body.players.player1.mulligansUsed).toBe(1);
+  });
 });
