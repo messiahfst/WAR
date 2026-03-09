@@ -28,10 +28,18 @@
   filter: blur(2px);
 }
 
-.menu-card {
+.menu-grid {
   position: relative;
   z-index: 1;
-  width: min(520px, 92vw);
+  width: min(980px, 94vw);
+  display: grid;
+  grid-template-columns: minmax(380px, 1fr) minmax(300px, 0.8fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.menu-card {
+  position: relative;
   border: 1px solid #3a4660;
   border-radius: 16px;
   background: rgba(11, 15, 24, 0.9);
@@ -41,11 +49,24 @@
   gap: 1rem;
 }
 
+.menu-main-card {
+  align-content: start;
+}
+
+.menu-settings-card {
+  align-content: start;
+}
+
 .menu-logo {
-  width: 72px;
-  height: 72px;
-  border-radius: 12px;
+  width: min(420px, 82vw);
+  height: auto;
+  max-height: 38vh;
+  object-fit: contain;
+  justify-self: center;
+  border-radius: 14px;
   border: 1px solid #425070;
+  padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .menu-card h1 {
@@ -828,8 +849,9 @@ button:disabled {
     display: none;
   }
 
-  .menu-card {
+  .menu-grid {
     width: min(560px, 94vw);
+    grid-template-columns: 1fr;
   }
 
   .desktop-only-warning {
