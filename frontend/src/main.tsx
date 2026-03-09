@@ -326,8 +326,8 @@ function CardTile(props: {
   const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
   
-  // Unit health bar
-  const showHealthBar = card.type === "UNIT" && card.power !== undefined;
+  // Unit health bar - nur auf dem Board anzeigen
+  const showHealthBar = card.type === "UNIT" && card.power !== undefined && location === "board";
   const maxPower = 5; // typical max power for display
   const powerPercentage = showHealthBar ? Math.max(0, Math.min(100, ((card.power ?? 0) / maxPower) * 100)) : 0;
   
