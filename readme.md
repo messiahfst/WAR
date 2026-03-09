@@ -87,19 +87,17 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
 - [x] **Playable Card Highlighting** - Grüne Umrandung für spielbare Karten
 - [x] **Simplify Attack Flow** - Direkter "Angreifen"-Button auf Units (keine Modal-Umwege)
 - [x] **Board Layout Redesign** - Horizontal: Gegner links | Front-Divider | Spieler rechts
-- [x] **Block Mechanic Core** - Vollständig implementiert:
-  - Backend: Angriffszustand (pendingAttacks), Block-Deklaration, Combat-Auflösung
-  - Frontend: BlockModal für Blocker-Auswahl
-  - AI: Automatische Block-Entscheidungen mit Logik
 - [x] **INSTANT Effect Animations** - ✅ Implementiert (Option 2):
   - Grüner Glow-Puls auf Player-HQ bei HEAL
   - Rotes Flash auf Enemy-HQ bei DAMAGE
   - Karten-Flug-Animation vom Deck zur Hand bei DRAW
+- [x] **Drag-Drop Visual Feedback** - ✅ Implementiert (Option 3):
+  - Drop-Zonen glühen/pulsieren während Card-Drag
+  - Inaktive Zonen werden gedimmt bei Drag
+  - Klare visuelle Unterscheidung Valid/Hover-Zonen
 
-#### ⏳ Phase 5 Fortsetzung (Nach Testing)
-- [ ] **Drag-Drop Visual Feedback** - Drop-Zonen highlighten/glühen während Drag
-  - Zeitaufwand: 1-2 Stunden
-- [ ] **Combat Animations** - Visuelle Kampf-Animation zwischen blockenden Units
+#### ⏳ Phase 5 Abschluss
+- [ ] **Gradual Damage System** - ⚠️ CRITICAL ENGINE REFACTOR
   - Zeitaufwand: optional/polish feature
 
 ---

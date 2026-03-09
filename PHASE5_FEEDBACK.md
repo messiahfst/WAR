@@ -174,60 +174,54 @@ Bitte teste Folgendes und gib Feedback:
 
 ---
 
-## ✅ Session 2.1 - INSTANT Effect Animations (Option 2) - COMPLETED
+## ✅ Session 2.2 - Drag-Drop Visual Feedback (Option 3) - COMPLETED
 
 **Implementiert am** 9. März 2026
 
 ### Was wurde gebaut:
 
-**HEAL Animationen:**
-- Grüner Glow-Puls auf Player-HQ Health Bar
-- Aktiviert sich automatisch wenn INSTANT HEAL Karte gespielt wird
-- 800ms Animation - visuelles Feedback für Heilung
-- Log-Message: "💚 Heileffekt aktiviert!"
+**Drop Zone Glow Animation:**
+- Zones pulsieren mit blaupulem Glow wenn Card über sie gezogen wird
+- 600ms infinite animation mit smooth scaling und shadow effects
+- Äußerer Shadow expandiert während des Pulses
 
-**DAMAGE Animationen:**
-- Rotes Flash auf Gegner-HQ Health Bar
-- Aktiviert sich automatisch wenn INSTANT DAMAGE Karte gespielt wird
-- 600ms Animation - dramatischer Effekt für Angriff
-- Log-Message: "💥 Schadenseffekt!"
+**Drag State Awareness:**
+- Alle Drop-Zonen werden auf 60% Opacity gedimmt wenn Card gezogen wird
+- Gehover Zones (hot state) bleiben vollständig sichtbar mit Glow
+- Klare visuelle Unterscheidung zwischen verfügbaren und gehover Zonen
 
-**DRAW Animationen:**
-- Karten fliegen vom Deck zur Hand mit kubischem Easing
-- Karten skalieren down während sie fliegen (0.6x Größe am Ende)
-- 800ms Animation
-- Log-Message: "📨 {CardName} wurde gezogen!"
+**Interaction Enhancements:**
+- Neu: isDragging State zum Tracken von aktiven Drag-Operationen
+- Updated drag start handler: setzt isDragging = true
+- Updated drag end handler: cleant alle drag state (dragZone, isDragging)
+- Verbessertes visual feedback während ganzer Drag-Operation
 
 ### Technische Details:
-- CSS Keyframe Animationen (healPulse, damageFlash, cardFly)
-- React State Management (healEffect, damageEffect, drawingCardIds)
-- Modified playCard() to detect INSTANT effects and trigger animations
-- HealthBar Component updated mit effect props (healEffect, damageEffect)
-- CardTile Component erweitert mit drawing prop für DRAW Animation
+- Neue @keyframes dropZoneGlow Animation
+- Neue .zone-column.drag-active CSS-Klasse
+- Enhanced transitions mit cubic-bezier easing
+- Improved box-shadow effects für Glow
 
 ### Build Status:
 - ✅ Backend: TypeScript compilation OK
-- ✅ Frontend: 165.53 KB JS, 14.92 KB CSS
-- ✅ Git Commit: e80edf3
+- ✅ Frontend: 165.63 KB JS, 15.43 KB CSS
+- ✅ Git Commit: 8615752
 
 ---
 
-## 🔄 Nächste Implementierungs-Optionen
+## 🔄 Verbleibende Phase 5 Implementierung
 
-**Status:** Option 2 ✅ Fertig. Jetzt bereit für:
+**Status:** Option 3 ✅ Fertig. 
 
-**Option 3: Drag-Drop Visual Feedback** (1-2 Stunden) - START NEXT
-- Drop-Zonen blinken/glühen wenn du Card draggst
-- Zeigt an wo du die Card spielen kannst
-- Visual Polish
+**Nächste Priorität:**
 
-**Option 4: Gradual Damage System** (4-6 Stunden - CRITICAL) - HIGHEST PRIORITY LONG-TERM
-- Units haben separate Attack + HP Stats
-- Können graduell Schaden nehmen
-- Basis für Healing Cards
-- Große Engine-Refactoring
+**Option 4: Gradual Damage System** (4-6 Stunden - CRITICAL) - RECOMMENDED NEXT
+- Units haben separate Attack (Puste) + HP (Panzerung) Stats
+- Können graduell Schaden nehmen statt sofort zu sterben
+- Basis für Healing Card Funktionalität
+- Große Engine-Refactoring mit großem Game-Impact
 
 ---
 
-**Status:** 🟡 Option 2 Fertig - Bereit für Option 3 oder 4?
+**Status:** 🟢 Option 3 Fertig - 9/10 Phase 5 Features Complete - Option 4 Ready to Start?
 
