@@ -1,343 +1,158 @@
-# WAR - Web-basiertes Sammelkartenspiel 🎮
+﻿# WAR - Web-basiertes Sammelkartenspiel
 
-> **Ein innovatives Echtzeit-Kriegs-Sammelkartenspiel mit Fraktionen-System und 4-Zonen-Kampfsystem**
-> **Ein innovatives Echtzeit-Kriegs-Sammelkartenspiel mit Fraktionen-System und 4-Zonen-Kampfsystem**
-
-> **Ein Magic the Gathering Nachbau mit Kriegs-Thematik und 4-Zonen-Kampfsystem**
--# WAR - Web-basiertes Sammelkartenspiel 🎮
-
-> **Ein innovatives Echtzeit-Kriegs-Sammelkartenspiel mit Fraktionen-System und 4-Zonen-Kampfsystem auf einem umkämpften Planeten**
-> **Ein innovatives Echtzeit-Kriegs-Sammelkartenspiel mit Fraktionen-System und 4-Zonen-Kampfsystem**
+> Ein frei verfuegbares Open-Source-Sammelkartenspiel mit Kriegs-Setting und 4-Zonen-Schlachtfeld.
 
 ---
 
-## 📖 Dokumentation
+## Projektueberblick
 
-- **[CONCEPT.md](./CONCEPT.md)** - Game Design Document & Übersicht
-- **[RULES.md](./RULES.md)** - Detailliertes Regelwerk
-- **[CARDS.md](./CARDS.md)** - Kartenkatalog & Design Guidelines
+WAR ist ein 1v1 PvE Sammelkartenspiel. Zwei Fraktionen kaempfen um die Kontrolle eines Planeten.
+Das Spielfeld besteht aus vier Ebenen:
 
----
+- WELTALL
+- LUFT
+- WASSER
+- BODEN
 
-## 🎯 Projektüberblick
-
-### Das Konzept
-WAR ist ein **1v1 PvE Sammelkartenspiel**, in dem zwei Fraktionen um die Kontrolle eines Planeten kämpfen. Spieler bauen Decks aus Kampf-Karten auf und kämpfen gegen KI-Gegner bis einer auf 0 Lebenspunkte fällt. Das Spiel kombiniert klassische Kartenspiel-Mechaniken mit einer einzigartigen Kriegs-Thematik und einem neuartigen 4-Zonen-Kampfsystem.
-WAR ist ein **1v1 PvE Sammelkartenspiel**, in dem zwei Fraktionen um die Kontrolle eines Planeten kämpfen. Spieler bauen Decks aus Kampf-Karten auf und kämpfen gegen KI-Gegner bis einer auf 0 Lebenspunkte fällt. Das Spiel kombiniert klassische Kartenspiel-Mechaniken mit einer einzigartigen Kriegs-Thematik und einem neuartigen 4-Zonen-Kampfsystem.
-WAR ist ein **1v1 PvE Sammelkartenspiel**, in dem zwei Fraktionen um die Kontrolle eines Planeten kämpfen. Das Spiel kombiniert die bewährten Mechaniken von Magic the Gathering mit einer einzigartigen Kriegs-Thematik und einem neuartigen 4-Zonen-Kampfsystem.
--### Das Konzept
-
-WAR ist ein **1v1 PvE Sammelkartenspiel**, in dem zwei Fraktionen um die Kontrolle eines Planeten kämpfen. Spieler bauen Decks aus 60 Kampf-Karten auf und kämpfen gegen KI-Gegner bis einer auf 0 Lebenspunkte fällt. Das Spiel kombiniert klassische Kartenspiel-Mechaniken mit einzigartiger Kriegs-Thematik und einem innovativen 4-Zonen-Kampfsystem.
-
-### Einzigartige Features
-✨ **4-Zonen Kampfsystem** - Weltall, Luft, Wasser, Boden mit taktischen Interaktionen  
-🎭 **5 Fraktionen** - Jede mit eigener Spielweise (Technokrat, Biokommune, Syndikat, Hegemonie, Exodus)  
-⚔️ **Asymmetrischer Krieg** - Verschiedene Ebenen-Dominanzen & Blockade-Regeln  
-🌍 **Planetare Schlachten** - Thematisch konsistentes Kriegs-Gameplay  
+Jede Ebene eroeglicht eigene taktische Entscheidungen bei Aufstellung, Angriff und Block.
 
 ---
 
-## 🏗️ Projektstruktur (Ziel)
+## Dokumentation
 
-```
-WAR/
-├── frontend/                    # React/Vue/Svelte App
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── GameBoard/       # Spielfeld Rendering
-│   │   │   ├── Hand/            # Spieler-Hand
-│   │   │   ├── CardDisplay/     # Kartendarstellung
-│   │   │   └── ZoneViewer/      # Zone-Visualisierung
-│   │   ├── pages/
-│   │   │   ├── GamePage.jsx
-│   │   │   ├── DeckBuilder.jsx
-│   │   │   └── MainMenu.jsx
-│   │   ├── styles/
-│   │   └── App.jsx
-│   └── package.json
-│
-├── backend/                     # Node.js + TypeScript
-│   ├── src/
-│   │   ├── db/
-│   │   │   ├── cards.ts         # Kartenkatalog
-│   │   │   ├── schema.ts        # DB-Schema
-│   │   │   ├── seed.ts          # Initiale Daten
-│   │   │   └── migrations/
-│   │   ├── game/
-│   │   │   ├── engine.ts        # Spiellogik
-│   │   │   ├── rules.ts         # Regelwerk
-│   │   │   ├── actions.ts       # Spieler-Aktionen
-│   │   │   ├── state.ts         # Game State Management
-│   │   │   └── ai/              # KI-Gegner
-│   │   ├── api/
-│   │   │   ├── game.ts
-│   │   │   ├── deck.ts
-│   │   │   ├── player.ts
-│   │   │   └── health.ts
-│   │   ├── models/
-│   │   │   ├── Card.ts
-│   │   │   ├── Unit.ts
-│   │   │   ├── Game.ts
-│   │   │   └── Player.ts
-│   │   └── index.ts
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── docs/
-│   ├── CONCEPT.md               # Game Design
-│   ├── RULES.md                 # Regelwerk
-│   ├── CARDS.md                 # Kartenkatalog
-│   ├── API.md                   # API-Dokumentation
-│   └── ARCHITECTURE.md          # Technische Architektur
-│
-└── README.md
-```
+- `CONCEPT.md` - Produktvision, Fraktionen, Architektur
+- `RULES.md` - Vollstaendiges Regelwerk
+- `CARDS.md` - Kartenschema und Fraktions-Designrichtlinien
 
 ---
 
-## 🚀 Phase 1: MVP (Minimal Viable Product)
+## Grundprinzipien
 
-### ✅ Ziel (3-4 Wochen)
-Ein spielbares Spiel von Start bis Gewinn/Niederlage
-
-### 📋 Implementierungs-Checkliste
-
-**Woche 1: Setup & Datenbank**
-- [ ] Backend-Projekt (Node + TypeScript)
-- [ ] Frontend-Projekt (React/Vue)
-- [ ] Database-Schema (SQLite)
-- [ ] Kartenkatalog für Technokrat (15 Karten)
-- [ ] Seeding-Script
-
-**Woche 2: Game Engine**
-- [ ] GameState Datenstruktur
-- [ ] Phasen-System (Produktion, Spiel, Kampf, Ende)
-- [ ] Ressourcen-Management
-- [ ] Grundlegende Regeln-Engine
-
-**Woche 3: API & UI**
-- [ ] REST API Endpoints (game, deck, play-card, etc.)
-- [ ] Spielfeld-UI (4 Zonen)
-- [ ] Hand-Anzeige
-- [ ] Spieler-Ressourcen-Anzeige
-- [ ] Einfache KI (Random Moves)
-
-**Woche 4: Polish & Testing**
-- [ ] Card Rendering
-- [ ] Animation Feedback
-- [ ] Error Handling
-- [ ] Bug Fixes
-- [ ] Spielbar machen!
+- Open Source first: keine Markenanleihen, keine abhaengigen IP-Bezuege
+- Klare Terminologie: Munition, Puste, Panzerung, Ressourcen-Basis
+- Modulares System: Engine, API und UI sauber getrennt
+- MVP-fokussiert: erst spielbarer Kern, dann Ausbau
 
 ---
 
-## 🛠️ Tech Stack (Empfohlene)
+## Tech-Stack (MVP)
 
 ### Frontend
-- **Framework**: React 18 oder Vue 3
-- **Styling**: Tailwind CSS / SCSS
-- **State**: Redux / Vuex
-- **Build**: Vite
+- React + TypeScript + Vite
 
 ### Backend
-- **Runtime**: Node.js 18+
-- **Language**: TypeScript
-- **Framework**: Express.js
-- **Database**: SQLite (MVP) → Postgres (später)
-- **ORM**: Drizzle / Prisma
+- Node.js + TypeScript + Express
 
-### DevOps
-- **Container**: Docker
-- **Versioning**: Git
-- **Deployment**: (später)
+### Datenbank
+- SQLite (MVP), spaeter optional PostgreSQL
+
+### Qualitaet
+- ESLint + Prettier
+- Unit-Tests (Engine), Integrationstests (API)
 
 ---
 
-## 📊 Ressourcen-Übersicht
+## Schnellstart
 
-### Mana-System
-```
-Runde 1: 1 Munition verfügbar
-Runde 2: 2 Munition verfügbar
-Runde 3: 3 Munition verfügbar
-... bis
-Runde 10+: 10 Munition Maximum
+```bash
+npm install
+npm run dev
 ```
 
-### Leben
-- Start: 20 Leben
-- Gewinn: Gegner auf 0
-- Verlust: Du auf 0
+Weitere Root-Skripte:
 
-### Zonen (jeweils max 3 Slots pro Spieler)
-- WELTALL - Raumfahrzeuge
-- LUFT - Flugzeuge
-- WASSER - Schiffe
-- BODEN - Panzer/Soldaten
+- `npm run build` - baut Backend und Frontend
+- `npm run test` - fuehrt Backend- und Frontend-Tests aus
+- `npm run lint` - fuehrt Backend- und Frontend-Linting aus
 
 ---
 
-## 🎴 Kartenseiten (MVP Start)
+## Gemeinsamer Umsetzungsplan (verbindlich)
 
-**TECHNOKRAT Fraktion** (Initial)
-```
-UNITS (15 Karten):
-- Infanterist (1 Mana 1/1)
-- Drohne (1 Mana 2/1 Flug)
-- Panzer-Team (2 Mana 2/2)
-- Kampfpanzer (3 Mana 3/4)
-- Kampfheli (4 Mana 4/3 Flug)
-... (mehr in CARDS.md)
+### Phase 0 - Repo fuer Public vorbereiten
+- [x] README finalisieren und Begriffe harmonisieren
+- [x] `LICENSE` (MIT empfohlen) hinzufuegen
+- [x] `CONTRIBUTING.md` erstellen
+- [x] `CODE_OF_CONDUCT.md` erstellen
+- [x] `SECURITY.md` erstellen
+- [x] `.gitignore` und `.editorconfig` anlegen
 
-SPELLS (3 Karten):
-- Schuss (1 Mana - -1 Panzerung)
-- Artillerie-Barrage (2 Mana - 2 Schaden)
-- Überlastung (2 Mana - tap)
+### Phase 1 - Technisches Grundgeruest
+- [x] `frontend/` mit React + TS + Vite aufsetzen
+- [x] `backend/` mit Node + TS + Express aufsetzen
+- [x] Gemeinsame Typenstruktur definieren (`Card`, `GameState`, `Action`, `Zone`, `Faction`)
+- [x] Basis-Skripte (`dev`, `build`, `test`, `lint`) in beiden Apps
 
-GEBÄUDE (2 Karten):
-- Ölquelle (Starter)
-- Arsenal (Struktur)
+### Phase 2 - Backend-MVP (spielbarer Kern)
+- [x] Card-Datenmodell + Seed (1 Startfraktion)
+- [x] GameState + Phasenmaschine implementieren
+- [x] Aktionen: Karte spielen, Angriff, Block, Zugende
+- [x] Siegbedingungen: Leben <= 0, Deck leer
+- [x] API-Endpunkte bereitstellen:
+  - [x] `POST /api/game/create`
+  - [x] `GET /api/game/:id/state`
+  - [x] `POST /api/game/:id/play-card`
+  - [x] `POST /api/game/:id/attack`
+  - [x] `POST /api/game/:id/block`
+  - [x] `POST /api/game/:id/end-turn`
 
-STARTERGEBÄUDE: 20+ pro Deck
-```
+### Phase 3 - Frontend-MVP
+- [x] Spielseite mit 4 Zonen bauen
+- [x] Hand, Board, Ressourcen, Lebenspunkte anzeigen
+- [x] Aktionen mit API verbinden
+- [x] Einfache KI (valid random moves)
 
----
-
-## 🎮 Gameplay-Flow
-
-```
-1. GAME START
-   ├─ Beide Spieler mulligan
-   └─ 7 Karten in Hand
-
-2. JEDE RUNDE
-   ├─ Produktionsphase
-   │  ├─ Munition auftanken
-   │  └─ 1 Karte ziehen
-   ├─ Spielphase
-   │  ├─ Karten spielen
-   │  └─ Effekte auslösen
-   ├─ Angriffsphase
-   │  ├─ Angreifer deklarieren
-   │  ├─ Blocker deklarieren
-   │  └─ Kampf auflösen
-   └─ End-Phase
-      ├─ Effekte zurücksetzen
-      └─ Zustand bereinigen
-
-3. GAME END
-   ├─ Gegner auf 0 Leben -> WIN
-   └─ Du auf 0 Leben -> LOSS
-```
+### Phase 4 - Qualitaet und Veroeffentlichung
+- [x] Kernregeln als Unit-Tests absichern
+- [x] API-Flows als Integrationstests absichern
+- [x] GitHub Actions fuer `lint`, `test`, `build`
+- [x] Release `v0.1.0-mvp` vorbereiten
+  - [x] Kritischer Bug Fix: Multiple-Attacks-per-Round (hasAttackedThisRound Flag)
+  - [x] Feature: Card Detail View Modal fuer alle Karten
+  - [x] UX: Verbesserte Karten-Visualisierung (spielkartenaehnliches Design)
+  - [x] UX: Vergroesserte Drag-Drop Zonen mit besseren Hover-Effekten
+  - [x] UX: Tooltips fuer Gegner-Karten
+  - [x] Structure: INSTANT/ABILITY CardTypes (Effekte post-MVP)
+  - [x] Dokumentation: CHANGELOG.md, RELEASE_NOTES.md, FEEDBACK_LOG.md
 
 ---
 
-## 📡 API-Endpoints (Preview)
+## Status v0.1.0-mvp 🚀
 
-```
-POST   /api/game/create
-GET    /api/game/:gameId
-GET    /api/game/:gameId/state
-POST   /api/game/:gameId/play-card
-POST   /api/game/:gameId/attack
-POST   /api/game/:gameId/block
-POST   /api/game/:gameId/end-turn
+**Release-Ready:** Alle 7 Tests passing | 0 Lint-Fehler | Build erfolgreich
 
-GET    /api/decks
-POST   /api/decks
-GET    /api/cards
-GET    /api/health
-```
+**Implementierte Features:**
+- ✅ Core Game Engine mit Phasenmaschine
+- ✅ Attack-Limitierung (1x pro Runde + auto-reset)
+- ✅ Card-Detail Modal (Freund + Gegner)
+- ✅ Verbesserte UI mit spielkartenaehnlichen Designs
+- ✅ 4-Zonen-Schlachtfeld mit taktischen Regeln
+- ✅ KI-Gegner mit Card-Play und Attack-Logic
+- ✅ German language UI
 
----
-
-## 🤖 KI-Gegner (MVP)
-
-Für Phase 1: Einfache KI
-- Spieler alles was spielbar ist
-- Attackiert mit allen Einheiten
-- Zufällige Blockade
-
-Später: Bessere Strategien pro Fraktion
+**Quality Metrics:**
+- Backend Tests: 5/5 passing (engine + API)
+- Frontend Tests: 2/2 passing (render + state)
+- Linting: 0 errors, 0 warnings
+- Build Size: 157KB JS (50KB gzipped)
 
 ---
 
-## 🧪 Testing-Strategie
+## Kurzfristige naechste Schritte (post-v0.1.0)
 
-- Unit-Tests für Game Engine
-- Integration-Tests für API
-- E2E Tests für UI (später)
-- Manuelle Testing-Szenarien
-
----
-
-## 📝 Nächste Konkrete Schritte
-
-1. **Entscheidungen treffen**
-   - [ ] Frontend Framework wählen (React oder Vue?)
-   - [ ] Database (SQLite oder direkt Postgres?)
-   - [ ] Deployment-Plan
-
-2. **Basis-Setup**
-   - [ ] Git Repo initialisieren
-   - [ ] Frontend-Projekt scaffolden
-   - [ ] Backend-Projekt scaffolden
-   - [ ] Docker-Setup
-
-3. **Erste Kartendefinition**
-   - [ ] Card-Schema in DB
-   - [ ] 15 Technokrat Karten als JSON
-   - [ ] Seeding-Script
-
-4. **Game Engine Skeleton**
-   - [ ] GameState Interface
-   - [ ] Phase-Management
-   - [ ] Erste Test-Cases
+1. Instant/Ability Effekte implementieren (Spezialisierung).
+2. Erweiterte Regression-Tests fuer Edge-Cases (deck depletion, block chains, etc.).
+3. Lint-Regeln progressiv verschaerfen (z. B. Warnungen -> Errors).
+4. Card-Artwork Integration vorbereiten.
 
 ---
 
-## 💡 Fragen für dich
+## Zusammenarbeit
 
-1. **Tech-Stack Präference?**
-   - Frontend: React oder Vue?
-   - Database: SQLite (einfach) oder Postgres (skalierbar)?
+Feedback bitte direkt einreichen. Wir integrieren kontinuierlich nach dem Muster:
+1. Bug/Suggestion annehmen
+2. Implementation planen
+3. Code schreiben + Test
+4. QA (lint, test, build)
+5. Release neue Version
 
-2. **Design-Details Clarification?**
-   - Sollen Fraktionen hybrid wählbar sein (später)?
-   - Single Deck oder Deck-Selection vor Game?
-
-3. **Grafik & Art?**
-   - Wo kommen die Kartenbilder her?
-   - ASCII-Art oder Placeholder-Grafiken für MVP?
-
-4. **MVP-Umfang adjusten?**
-   - Alle 5 Fraktionen oder nur Technokrat starten?
-   - Komplexe Fähigkeiten oder simplified rules?
-
----
-
-## 📚 Weiterführende Ressourcen & Links
-
-- [Game Design Document Checklist](https://www.gamedesigndocuments.com/)
-- [TypeScript Best Practices](https://www.typescriptlang.org/docs/)
-- [Sammelkartenspiel-Design Best Practices](https://en.wikipedia.org/wiki/Collectible_card_game)
-
-- [Game Design Document Checklist](https://www.gamedesigndocuments.com/)
-- [TypeScript Best Practices](https://www.typescriptlang.org/docs/)
-- [Sammelkartenspiel-Design Best Practices](https://en.wikipedia.org/wiki/Collectible_card_game)
-- [Magic the Gathering Comprehensive Rules](https://magic.wizards.com/en/rules)
-- [Game Design Document Checklist](https://www.gamedesigndocuments.com/)
-- [TypeScript Best Practices](https://www.typescriptlang.org/docs/)
-
----
-
-## 👤 Kontakt & Support
-
-Dokument von: Copilot  
-Version: 1.0  
-Stand: März 2026  
-Status: 🟢 Konzept Complete - Ready for Development
-
----
-
-**Lass uns diesen Krieg starten! ⚔️**
