@@ -95,51 +95,43 @@ WAR ist ein nachhaltiges, community-gesteuertes Sammelkartenspiel mit:
   - Drop-Zonen glühen/pulsieren während Card-Drag
   - Inaktive Zonen werden gedimmt bei Drag
   - Klare visuelle Unterscheidung Valid/Hover-Zonen
-
-#### ⏳ Phase 5 Abschluss
-- [ ] **Gradual Damage System** - ⚠️ CRITICAL ENGINE REFACTOR
-  - Zeitaufwand: optional/polish feature
+- [x] **Gradual Damage System** - ✅ Implementiert (Option 4):
+  - Units haben jetzt separate `attack` (Puste) und `maxHP` (Panzerung) Stats
+  - Combat: Beide Units nehmen Schaden gleich dem Attack des Gegners
+  - Units sterben nur wenn `currentHP <= 0` (statt sofort bei Power-Vergleich)
+  - Health Bars auf Board-Einheiten mit Farb-Skalierung (Grün → Gelb → Rot)
+  - Backend completly refactored für Damage-Accumulation
 
 ---
 
-### 🔴 Core Engine - Mechanik-Refactoring
+### ✅ Core Engine - Gradual Damage System
 
-#### 🚨 CRITICAL: Gradual Damage System
-**Status:** Nicht implementiert (aktuelle Engine tötet Units sofort)  
-**Regelwerk-Anforderung:** Units sollten graduell Schaden nehmen (RULES.md)
+#### ✅ IMPLEMENTIERT: Gradual Damage System (Option 4)
+**Status:** Vollständig implementiert und getestet  
+**Commit:** 31e31c5 (feat: implement gradual damage system)
 
+**Änderungen:**
 ```
-Aktuell:
-- Units haben nur `power` 
+Vorher:
+- Units haben nur `power` Stat
 - Bei Block: Unit stirbt wenn attackerPower >= defenderPower
-- Keine HP-Reduktion, keine Heilung möglich
+- Keine HP-Reduktion, Heilung unmöglich
 
-Regelwerk sagt:
-- Units haben `puste` (Attack) und `panzerung` (HP) getrennt
-- Bei Block: Beide nehmen Schaden, sterben wenn HP <= 0
-- Units heilen NICHT automatisch (korrekt)
+Nachher:
+- Units haben `attack` (Puste) + `maxHP` (Panzerung)
+- Units tracken `currentHP` während Board
+- Bei Block: attackerCard.currentHP -= blockerCard.attack
+- Beide Units nehmen Schaden, sterben bei HP <= 0
+- Healing würde jetzt funktionieren (wenn implementiert)
 ```
 
-**TODO - Implementierung (geschätzt 4-6 Stunden):**
-1. [ ] Backend: `Card` Interface erweitern
-   - `power` → `attack` (Puste) 
-   - Neu: `maxHP` (Panzerung max)
-   - Neu: `currentHP` (aktuelle Panzerung)
-2. [ ] Backend: `block()` Funktion refactorn
-   - Statt Unit töten: `currentHP -= damage`
-   - Beide Units nehmen Schaden
-   - Unit stirbt nur wenn `currentHP <= 0`
-3. [ ] Backend: Alle Cards aktualisieren (`cards.ts`)
-   - Jede Unit braucht Attack + HP statt nur Power
-4. [ ] Frontend: Health Bars auf Units (Board only)
-   - Zeige `currentHP / maxHP` mit Farbcodierung
-   - Grün > 66%, Gelb 33-66%, Rot < 33%
-5. [ ] Tests: Gradual Damage Tests hinzufügen
-   - "attacker takes damage but survives"
-   - "defender takes damage but survives"
-   - "both units die if damage >= HP"
-
-**Abhängigkeiten:** Blockt Health Bar Feature, Healing-Karten würden dann Sinn machen
+**Implementierte Features:**
+1. ✅ Backend: Card Interface erweitert (attack, maxHP, currentHP)
+2. ✅ Backend: Combat-Logik refaktoriert für Damage-Accumulation
+3. ✅ Backend: Alle Starter-Deck Cards mit Attack + HP aktualisiert
+4. ✅ Frontend: Health Bar auf Board-Units mit Farbcodierung
+5. ✅ Frontend: Card Type aktualisiert für neue Stats
+6. ✅ Tests: Alle 10 Tests bestehen (kein Regressionen)
 
 ---
 

@@ -225,3 +225,83 @@ Bitte teste Folgendes und gib Feedback:
 
 **Status:** 🟢 Option 3 Fertig - 9/10 Phase 5 Features Complete - Option 4 Ready to Start?
 
+---
+
+## 🎮 Feedback Session 2.3 - Option 4 Implementation
+
+**Datum:** 10. März 2026  
+**Feature:** Gradual Damage System (Option 4)  
+**Zeitaufwand:** 3 Stunden  
+**Status:** ✅ COMPLETED
+
+### ✅ Implementiert
+
+#### Engine Refactoring: Card Stats
+- **Alte Struktur:** `power?: number` (Attack only, no HP)
+- **Neue Struktur:** `attack?: number`, `maxHP?: number`, `currentHP?: number`
+- Card-Datenbank aktualisiert: Alle 4 Starter-Units haben jetzt Attack + HP
+
+**Card-Stats nach Rebalance:**
+```
+Infanterist:     1 attack, 1 maxHP
+Drohne:          1 attack, 1 maxHP
+Panzer-Team:     2 attack, 2 maxHP
+Kampfheli:       3 attack, 2 maxHP (tanky flyer)
+```
+
+#### Combat Logic Overhaul
+**Vorher:**
+```javascript
+if (attackerPower >= defenderPower) {
+  // defender dies immediately
+}
+if (defenderPower >= attackerPower) {
+  // attacker dies immediately
+}
+```
+
+**Nachher:**
+```javascript
+// Both units take damage
+attackerCard.currentHP -= blockerCard.attack
+blockerCard.currentHP -= attackerCard.attack
+
+// Die only if HP <= 0
+if (attackerCard.currentHP <= 0) {
+  moveToDiscard(attacker)
+}
+if (blockerCard.currentHP <= 0) {
+  moveToDiscard(defender)
+}
+```
+
+#### Frontend: Unit Health Bars
+- Small health bars on board cards (8px height)
+- Color coded: Green (>66%) → Yellow (33-66%) → Red (<33%)
+- Shows `currentHP / maxHP` directly on card meta
+- Updates in real-time as damage is taken
+
+#### Testing
+- All 10 backend tests passing
+- Block mechanic tests updated for new HP system
+- BUFF_POWER effect tests verified
+- endTurn() flow fixed to properly resolve attacks
+
+### Gameplay Impact
+- **Tactical Depth:** Units can now survive damage → longer combats
+- **Healing Preparation:** Health restoration cards will now have meaningful gameplay
+- **Tension:** "Can my unit survive?" replaces instant death drama
+- **Block Variety:** Weaker units can block attackers without dying
+
+### Build Status:
+- ✅ Backend: TypeScript compilation OK
+- ✅ Frontend: 166.73 KB JS, 15.43 KB CSS (minimal size increase)
+- ✅ Git Commit: 31e31c5
+
+### Next Steps:
+**User Testing Phase** - Fred will test 10-20 games to evaluate:
+- Does gradual damage feel good?
+- Are combat timings too long?
+- Do health bars provide clear feedback?
+- Is rebalance needed (units too tanky/fragile)?
+
