@@ -82,6 +82,42 @@ const CARD_RULES: Record<CardType, string> = {
   ABILITY: "Faehigkeit - permanenter Effekt solange auf dem Board."
 };
 
+// Health Bar Component
+function HealthBar(props: {
+  current: number;
+  max: number;
+  label: string;
+  isPlayer: boolean;
+}) {
+  const { current, max, label, isPlayer } = props;
+  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+  
+  let barColor = "#4caf50"; // green
+  if (percentage <= 25) {
+    barColor = "#f44336"; // red
+  } else if (percentage <= 50) {
+    barColor = "#ff9800"; // orange
+  }
+  
+  return (
+    <div className={`health-bar-container ${isPlayer ? "player" : "enemy"}`}>
+      <div className="health-bar-label">{label}</div>
+      <div className="health-bar-wrapper">
+        <div className="health-bar-bg">
+          <div 
+            className="health-bar-fill" 
+            style={{ 
+              width: `${percentage}%`,
+              background: `linear-gradient(90deg, ${barColor}, ${barColor}dd)`
+            }}
+          />
+        </div>
+        <div className="health-bar-text">{current} / {max}</div>
+      </div>
+    </div>
+  );
+}
+
 function GameOverModal(props: {
   state: GameState;
   onNewGame: () => void;
@@ -90,24 +126,34 @@ function GameOverModal(props: {
   const winner = state.winnerId;
   const isPlayerWin = winner === "player1";
   const title = isPlayerWin ? "🎉 Du hast gewonnen!" : "💥 Du hast verloren!";
-  const reasonText = state.endReason === "LIFE_ZERO" ? "HQ zerstört" : "Deck leer";
+  
+  let reasonText = "";
+  let reasonExplanation = "";
+  
+  if (state.endReason === "LIFE_ZERO") {
+    const loser = winner === "player1" ? "player2" : "player1";
+    reasonText = `${loser === "player1" ? "Dein" : "Gegner"} HQ wurde zerstört`;
+    reasonExplanation = "Leben auf 0 gefallen durch Angriffe";
+  } else if (state.endReason === "DECK_EMPTY") {
+    const loser = winner === "player1" ? "player2" : "player1";
+    reasonText = `${loser === "player1" ? "Dein" : "Gegner"} Deck ist leer`;
+    reasonExplanation = `${loser === "player1" ? "Du konntest" : "Gegner konnte"} keine Karte mehr ziehen`;
+  }
 
   return (
     <div className="modal-overlay game-over-overlay">
       <div className="modal-dialog game-over-dialog">
         <h1 className={isPlayerWin ? "win-title" : "lose-title"}>{title}</h1>
+        
+        <div className="game-over-reason">
+          <p className="reason-main">{reasonText}</p>
+          <p className="reason-sub">{reasonExplanation}</p>
+        </div>
+        
         <div className="game-over-stats">
           <div className="stat-row">
             <span className="stat-label">Zuege gespielt:</span>
             <span className="stat-value">{state.turn}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Gewinner:</span>
-            <span className="stat-value">{winner === "player1" ? "Du" : "Gegner (AI)"}</span>
-          </div>
-          <div className="stat-row">
-            <span className="stat-label">Grund:</span>
-            <span className="stat-value">{reasonText}</span>
           </div>
           <div className="stat-row">
             <span className="stat-label">Dein HQ:</span>
@@ -116,6 +162,14 @@ function GameOverModal(props: {
           <div className="stat-row">
             <span className="stat-label">Gegner HQ:</span>
             <span className="stat-value">{state.players.player2.life} ❤️</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Dein Deck:</span>
+            <span className="stat-value">{state.players.player1.drawPile.length} Karten übrig</span>
+          </div>
+          <div className="stat-row">
+            <span className="stat-label">Gegner Deck:</span>
+            <span className="stat-value">{state.players.player2.drawPile.length} Karten übrig</span>
           </div>
         </div>
         <div className="modal-actions">
@@ -267,9 +321,22 @@ function CardTile(props: {
   onDragStart?: (ev: React.DragEvent) => void;
   setRef?: (el: HTMLElement | null) => void;
   isPlayable?: boolean;
+  location?: "hand" | "board"; // NEW: track where card is displayed
 }) {
-  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable } = props;
-  const isAttacked = card.hasAttackedThisRound;
+  const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location } = props;
+  const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
+  
+  // Unit health bar
+  const showHealthBar = card.type === "UNIT" && card.power !== undefined;
+  const maxPower = 5; // typical max power for display
+  const powerPercentage = showHealthBar ? Math.max(0, Math.min(100, ((card.power ?? 0) / maxPower) * 100)) : 0;
+  
+  let powerColor = "#4caf50"; // green
+  if (powerPercentage <= 25) {
+    powerColor = "#f44336"; // red
+  } else if (powerPercentage <= 50) {
+    powerColor = "#ff9800"; // orange
+  }
   
   return (
     <article
@@ -282,6 +349,21 @@ function CardTile(props: {
       <span className="name">{card.name}</span>
       <span className="meta">{card.type} | {card.zone}</span>
       <span className="meta">Kosten {card.cost}{card.power ? ` | PWR ${card.power}` : ""}</span>
+      
+      {showHealthBar && (
+        <div className="card-health-bar">
+          <div className="card-health-bg">
+            <div 
+              className="card-health-fill" 
+              style={{ 
+                width: `${powerPercentage}%`,
+                backgroundColor: powerColor
+              }}
+            />
+          </div>
+        </div>
+      )}
+      
       {isAttacked && <span className="attacked-badge">Hat angegriffen</span>}
       <div className="card-tip">
         <strong>{card.name}</strong>
@@ -583,6 +665,22 @@ export function App() {
               <p>Desktop Tactical Card Combat</p>
             </div>
           </div>
+          
+          <div className="hq-health-display">
+            <HealthBar 
+              current={player?.life ?? 20}
+              max={20}
+              label="Dein HQ"
+              isPlayer={true}
+            />
+            <HealthBar 
+              current={enemy?.life ?? 20}
+              max={20}
+              label="Gegner HQ"
+              isPlayer={false}
+            />
+          </div>
+          
           <div className="top-stats">
             <span className="stat-pill">Turn: <strong>{state?.turn ?? "-"}</strong></span>
             <span className="stat-pill">Phase: <strong>{state?.phase ?? "-"}</strong></span>
@@ -628,6 +726,7 @@ export function App() {
                           owner="player2"
                           onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedDefenderId(c.id); }}
                           setRef={setCardRef(`p2:${card.id}`)}
+                          location="board"
                         />
                       ))}
                     </div>
@@ -653,6 +752,7 @@ export function App() {
                           owner="player1"
                           onDetailClick={(c, o) => { setDetailCard(c); setDetailCardOwner(o); setSelectedAttackerId(c.id); }}
                           setRef={setCardRef(`p1:${card.id}`)}
+                          location="board"
                         />
                       ))}
                     </div>
@@ -687,6 +787,7 @@ export function App() {
                       onDragStart={(ev) => ev.dataTransfer.setData("text/plain", card.id)}
                       setRef={setCardRef(`h:${card.id}`)}
                       isPlayable={isPlayable}
+                      location="hand"
                     />
                   );
                 })}
