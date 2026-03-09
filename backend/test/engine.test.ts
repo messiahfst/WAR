@@ -216,4 +216,51 @@ describe("engine", () => {
       "Illegal block"
     );
   });
+
+  it("prevents normal units from attacking on the same turn they are played", () => {
+    const game = createGame();
+    const state = getState(game.gameId);
+    if (!state) throw new Error("State not found");
+
+    state.players.player1.munition = 10;
+    state.players.player1.hand.push({
+      id: "test-normal",
+      name: "Test Unit",
+      type: "UNIT",
+      zone: "BODEN",
+      cost: 1,
+      attack: 2,
+      maxHP: 2
+    });
+
+    const afterPlay = playCard(game.gameId, "player1", "test-normal");
+    const unit = afterPlay.players.player1.board.find((c) => c.id === "test-normal");
+    expect(unit?.summoningSickness).toBe(true);
+
+    expect(() => attack(game.gameId, "player1", "test-normal")).toThrow(
+      "cannot attack on the turn it was played"
+    );
+  });
+
+  it("allows HASTE units to attack on the same turn they are played", () => {
+    const game = createGame();
+    const state = getState(game.gameId);
+    if (!state) throw new Error("State not found");
+
+    state.players.player1.munition = 10;
+    state.players.player1.hand.push({
+      id: "test-haste",
+      name: "Test Haste Unit",
+      type: "UNIT",
+      zone: "LUFT",
+      cost: 1,
+      attack: 1,
+      maxHP: 1,
+      keywords: ["HASTE"]
+    });
+
+    playCard(game.gameId, "player1", "test-haste");
+
+    expect(() => attack(game.gameId, "player1", "test-haste")).not.toThrow();
+  });
 });

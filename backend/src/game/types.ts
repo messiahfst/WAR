@@ -17,6 +17,8 @@ export interface Card {
   attack?: number;      // Puste (Angriffskraft)
   maxHP?: number;       // Panzerung max (Toughness)
   currentHP?: number;   // Panzerung aktuell (Current health on board)
+  keywords?: Array<"HASTE">;
+  summoningSickness?: boolean;
   hasAttackedThisRound?: boolean;
   effect?: CardEffect;
   description?: string;

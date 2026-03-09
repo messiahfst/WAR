@@ -17,7 +17,7 @@ describe("game api", () => {
     expect(state.body.activePlayerId).toBe("player1");
   });
 
-  it("runs basic play -> attack -> end-turn flow", async () => {
+  it("runs basic play -> end-turn flow", async () => {
     const app = createApp();
     const created = await request(app).post("/api/game/create");
     const gameId = created.body.gameId as string;
@@ -33,18 +33,6 @@ describe("game api", () => {
       .post(`/api/game/${gameId}/play-card`)
       .send({ playerId: "player1", cardId: playable?.id })
       .expect(200);
-
-    const afterPlay = await request(app).get(`/api/game/${gameId}/state`);
-    const attacker = (afterPlay.body.players.player1.board as Array<{ id: string; type: string }>).find(
-      (c) => c.type === "UNIT"
-    );
-
-    if (attacker) {
-      await request(app)
-        .post(`/api/game/${gameId}/attack`)
-        .send({ playerId: "player1", attackerCardId: attacker.id })
-        .expect(200);
-    }
 
     const afterEnd = await request(app)
       .post(`/api/game/${gameId}/end-turn`)

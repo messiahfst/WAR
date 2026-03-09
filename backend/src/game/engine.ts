@@ -231,6 +231,8 @@ export function playCard(gameId: string, playerId: string, cardId: string): Game
     // Initialize currentHP for UNIT cards
     if (card.type === "UNIT" && card.maxHP) {
       card.currentHP = card.maxHP;
+      card.summoningSickness = !(card.keywords?.includes("HASTE"));
+      card.hasAttackedThisRound = false;
     }
     player.board.push(card);
     
@@ -292,6 +294,7 @@ export function endTurn(gameId: string, playerId: string): GameState {
   nextPlayer.board.forEach((card) => {
     if (card.type === "UNIT") {
       card.hasAttackedThisRound = false;
+      card.summoningSickness = false;
     }
   });
 
@@ -334,6 +337,10 @@ export function attack(gameId: string, playerId: string, attackerCardId: string)
 
   if (attacker.hasAttackedThisRound) {
     throw new Error("This unit has already attacked this round");
+  }
+
+  if (attacker.summoningSickness) {
+    throw new Error("This unit cannot attack on the turn it was played");
   }
 
   // Add to pending attacks list

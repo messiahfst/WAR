@@ -22,6 +22,8 @@ type Card = {
   attack?: number;      // Puste (Angriffskraft)
   maxHP?: number;       // Panzerung (max health)
   currentHP?: number;   // Current health on board
+  keywords?: Array<"HASTE">;
+  summoningSickness?: boolean;
   hasAttackedThisRound?: boolean;
   effect?: CardEffect;
   description?: string;
@@ -322,6 +324,12 @@ function CardDetailModal(props: {
                 <span className="value power-badge">{card.maxHP}</span>
               </div>
             )}
+            {card.keywords?.includes("HASTE") && (
+              <div className="detail-row">
+                <span className="label">Fähigkeit:</span>
+                <span className="value power-badge">Sofort angreifen</span>
+              </div>
+            )}
           </div>
           <div className="detail-section">
             <h3>Fähigkeit</h3>
@@ -494,6 +502,7 @@ function CardTile(props: {
 }) {
   const { card, selected, animated, focused, owner, onDetailClick, draggable, onDragStart, setRef, isPlayable, location, canAttack, onAttackClick, drawing } = props;
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
+  const hasSummoningSickness = card.type === "UNIT" && location === "board" && card.summoningSickness;
   const showHealthBar = location === "board" && card.type === "UNIT" && card.maxHP;
   
   return (
@@ -537,9 +546,11 @@ function CardTile(props: {
       )}
       
       {isAttacked && <span className="attacked-badge">Hat angegriffen</span>}
+      {hasSummoningSickness && <span className="attacked-badge">Kann noch nicht angreifen</span>}
       <div className="card-tip">
         <strong>{card.name}</strong>
         <p>{CARD_RULES[card.type]}</p>
+        {card.keywords?.includes("HASTE") && <p><small>Spezial: Sofort angreifen</small></p>}
         {location === "hand" && <p><small>Klick: Details | Drag: Ausspielen</small></p>}
         {location === "board" && <p><small>Klick: Details anzeigen</small></p>}
       </div>
@@ -851,7 +862,7 @@ export function App() {
     }
 
     const attacker = player?.board.find((c) => c.id === attackerCardId);
-    if (!attacker || attacker.hasAttackedThisRound) {
+    if (!attacker || attacker.hasAttackedThisRound || attacker.summoningSickness) {
       return;
     }
 
@@ -1022,7 +1033,9 @@ export function App() {
       await delay(440);
     }
 
-    const aiUnit = after.players.player2.board.find((c) => c.type === "UNIT");
+    const aiUnit = after.players.player2.board.find(
+      (c) => c.type === "UNIT" && !c.hasAttackedThisRound && !c.summoningSickness
+    );
     if (aiUnit && !after.isGameOver) {
       setAiFocusCardId(aiUnit.id);
       addLog(`AI berechnet Angriff mit ${aiUnit.name}...`);
@@ -1283,7 +1296,7 @@ export function App() {
                       </div>
                       <div className="cards-area player-area">
                         {cardsInZone(player?.board, zone).map((card) => {
-                          const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && isMyTurn && !busy && !state?.isGameOver;
+                          const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && !card.summoningSickness && isMyTurn && !busy && !state?.isGameOver;
                           return (
                             <CardTile
                               key={`p1-${card.id}-${zone}`}

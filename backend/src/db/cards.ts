@@ -2,7 +2,17 @@ import type { Card } from "../game/types.js";
 
 export const starterDeck: Card[] = [
   { id: "c1", name: "Infanterist", type: "UNIT", zone: "BODEN", cost: 1, attack: 1, maxHP: 1 },
-  { id: "c2", name: "Drohne", type: "UNIT", zone: "LUFT", cost: 1, attack: 1, maxHP: 1 },
+  {
+    id: "c2",
+    name: "Drohne",
+    type: "UNIT",
+    zone: "LUFT",
+    cost: 1,
+    attack: 1,
+    maxHP: 1,
+    keywords: ["HASTE"],
+    description: "Sofort angreifen"
+  },
   { id: "c3", name: "Panzer-Team", type: "UNIT", zone: "BODEN", cost: 2, attack: 2, maxHP: 2 },
   { id: "c4", name: "Kampfheli", type: "UNIT", zone: "LUFT", cost: 4, attack: 3, maxHP: 2 },
   { id: "c5", name: "Schuss", type: "SPELL", zone: "BODEN", cost: 1 },
