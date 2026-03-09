@@ -331,8 +331,13 @@ function BlockModal(props: {
     return null;
   }
 
-  const defendingPlayer = gameState.players.player1;
-  const attackingPlayer = gameState.players.player2;
+  // Determine who is attacking and who is defending based on activePlayer and targetPlayerId
+  const attack = pendingAttacks[0];
+  const defendingPlayerId = attack.targetPlayerId;
+  const attackingPlayerId = defendingPlayerId === "player1" ? "player2" : "player1";
+  
+  const defendingPlayer = gameState.players[defendingPlayerId];
+  const attackingPlayer = gameState.players[attackingPlayerId];
   const allAttacksBlocked = pendingAttacks.every(att => declaredBlockers[att.attackerId]);
 
   return (
@@ -735,6 +740,38 @@ export function App() {
     }
 
     addLog("AI startet Zug.");
+    
+    // Check if there are pending attacks we need to declare blocks for
+    if (current.pendingAttacks && current.pendingAttacks.length > 0) {
+      addLog("AI analysiert Angriffe...");
+      await delay(500);
+      
+      for (const attack of current.pendingAttacks) {
+        const attacker = current.players.player1.board.find(c => c.id === attack.attackerId);
+        const defender = current.players.player2.board.find(c => c.type === "UNIT");
+        
+        if (attacker && defender && Math.random() > 0.3) { // 70% chance to block with strongest unit
+          addLog(`AI blockt ${attacker.name} mit ${defender.name}.`);
+          await delay(300);
+          const blockRes = await api.declareBlock(gameId, "player2", attack.attackerId, defender.id);
+          if (!isError(blockRes)) {
+            setState(blockRes);
+            await flashCard(defender.id);
+          }
+        }
+      }
+      
+      addLog("AI beendet Blocking.");
+      await delay(400);
+      
+      // Now resolve the attacks
+      const ended = await api.endTurn(gameId, "player2");
+      if (!isError(ended)) {
+        setState(ended);
+      }
+      return;
+    }
+
     addLog("AI analysiert Hand...");
     await delay(480);
 
