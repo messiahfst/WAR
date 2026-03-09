@@ -76,6 +76,17 @@ const ZONE_HINT: Record<Zone, string> = {
   BODEN: "Kann nur Boden angreifen"
 };
 
+const ZONE_LEVEL: Record<Zone, number> = {
+  BODEN: 1,
+  WASSER: 2,
+  LUFT: 3,
+  WELTALL: 4
+};
+
+function canBlockZone(attackerZone: Zone, defenderZone: Zone): boolean {
+  return ZONE_LEVEL[defenderZone] >= ZONE_LEVEL[attackerZone];
+}
+
 const CARD_RULES: Record<CardType, string> = {
   UNIT: "Kaempft auf dem Board. Kann angreifen und geblockt werden.",
   SPELL: "Einmaleffekt. Wird beim Spielen in den Discard gelegt.",
@@ -365,7 +376,19 @@ function BlockModal(props: {
   
   const defendingPlayer = gameState.players[defendingPlayerId];
   const attackingPlayer = gameState.players[attackingPlayerId];
-  const allAttacksBlocked = pendingAttacks.every(att => declaredBlockers[att.attackerId]);
+  const legalBlockersForAttack = (attackerId: string) => {
+    const attackerCard = attackingPlayer.board.find((c) => c.id === attackerId);
+    if (!attackerCard) {
+      return [] as Card[];
+    }
+    return defendingPlayer.board.filter(
+      (c) => c.type === "UNIT" && canBlockZone(attackerCard.zone, c.zone)
+    );
+  };
+
+  const allAttacksHandled = pendingAttacks.every(
+    (att) => declaredBlockers[att.attackerId] || legalBlockersForAttack(att.attackerId).length === 0
+  );
 
   return (
     <div className="modal-overlay" style={{ zIndex: 1000 }}>
@@ -380,6 +403,7 @@ function BlockModal(props: {
           {pendingAttacks.map((attack) => {
             const attacker = attackingPlayer.board.find(c => c.id === attack.attackerId);
             const isBlocked = !!declaredBlockers[attack.attackerId];
+            const legalBlockers = legalBlockersForAttack(attack.attackerId);
             const blockerCard = isBlocked ? defendingPlayer.board.find(c => c.id === declaredBlockers[attack.attackerId]) : null;
 
             return (
@@ -399,28 +423,36 @@ function BlockModal(props: {
                   </p>
                 ) : (
                   <>
-                    <p style={{ marginBottom: "0.5rem", fontSize: "0.9em" }}>Wähle einen Blocker:</p>
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                      {defendingPlayer.board.filter(c => c.type === "UNIT").map(defender => (
-                        <button
-                          key={defender.id}
-                          onClick={() => onBlockDeclare(attack.attackerId, defender.id)}
-                          disabled={busy}
-                          style={{
-                            padding: "0.5rem 0.75rem",
-                            background: "#0066cc",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "3px",
-                            cursor: busy ? "not-allowed" : "pointer",
-                            opacity: busy ? 0.6 : 1,
-                            fontSize: "0.85em"
-                          }}
-                        >
-                          {defender.name} ({defender.attack ?? 1})
-                        </button>
-                      ))}
-                    </div>
+                    {legalBlockers.length > 0 ? (
+                      <>
+                        <p style={{ marginBottom: "0.5rem", fontSize: "0.9em" }}>Wähle einen Blocker:</p>
+                        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                          {legalBlockers.map(defender => (
+                            <button
+                              key={defender.id}
+                              onClick={() => onBlockDeclare(attack.attackerId, defender.id)}
+                              disabled={busy}
+                              style={{
+                                padding: "0.5rem 0.75rem",
+                                background: "#0066cc",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "3px",
+                                cursor: busy ? "not-allowed" : "pointer",
+                                opacity: busy ? 0.6 : 1,
+                                fontSize: "0.85em"
+                              }}
+                            >
+                              {defender.name} ({defender.attack ?? 1})
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p style={{ color: "#f0ad4e", marginBottom: 0 }}>
+                        Kein legaler Blocker verfügbar (Zone-Regel).
+                      </p>
+                    )}
                   </>
                 )}
               </div>
@@ -432,8 +464,8 @@ function BlockModal(props: {
           <button 
             className="primary" 
             onClick={onBlocksComplete}
-            disabled={busy || !allAttacksBlocked}
-            title={!allAttacksBlocked ? "Alle Angriffe müssen blockiert sein" : ""}
+            disabled={busy || !allAttacksHandled}
+            title={!allAttacksHandled ? "Alle blockbaren Angriffe müssen behandelt sein" : ""}
           >
             Blockieren abschließen
           </button>
@@ -942,7 +974,9 @@ export function App() {
       
       for (const attack of current.pendingAttacks) {
         const attacker = current.players.player1.board.find(c => c.id === attack.attackerId);
-        const defender = current.players.player2.board.find(c => c.type === "UNIT");
+        const defender = current.players.player2.board.find(
+          c => c.type === "UNIT" && attacker && canBlockZone(attacker.zone, c.zone)
+        );
         
         if (attacker && defender && Math.random() > 0.3) { // 70% chance to block with strongest unit
           addLog(`AI blockt ${attacker.name} mit ${defender.name}.`);

@@ -20,6 +20,18 @@ function otherPlayerId(playerId: string): string {
   return playerId === "player1" ? "player2" : "player1";
 }
 
+const ZONE_LEVEL: Record<Card["zone"], number> = {
+  BODEN: 1,
+  WASSER: 2,
+  LUFT: 3,
+  WELTALL: 4
+};
+
+function canBlockZone(attackerZone: Card["zone"], defenderZone: Card["zone"]): boolean {
+  // Same level or higher can block lower levels; e.g. BODEN cannot block WELTALL.
+  return ZONE_LEVEL[defenderZone] >= ZONE_LEVEL[attackerZone];
+}
+
 function ensureGameActive(state: GameState): void {
   if (state.isGameOver) {
     throw new Error("Game is already over");
@@ -372,6 +384,10 @@ export function declareBlock(
   const defender = defenderOwner.board.find((card) => card.id === defenderCardId);
   if (!defender || defender.type !== "UNIT") {
     throw new Error("Defender not found on defender board or not a unit");
+  }
+
+  if (!canBlockZone(attacker.zone, defender.zone)) {
+    throw new Error(`Illegal block: ${defender.zone} cannot block ${attacker.zone}`);
   }
 
   // Store block declaration

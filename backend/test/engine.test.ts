@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGame, endTurn, getState, mulligan, playCard } from "../src/game/engine.js";
+import { attack, createGame, declareBlock, endTurn, getState, mulligan, playCard } from "../src/game/engine.js";
 
 describe("engine", () => {
   it("switches active player and increments turn on end turn", () => {
@@ -183,5 +183,37 @@ describe("engine", () => {
     const afterSecond = mulligan(game.gameId, "player1");
     expect(afterSecond.players.player1.hand.length).toBe(3);
     expect(afterSecond.players.player1.mulligansUsed).toBe(2);
+  });
+
+  it("prevents illegal block from lower zone (BODEN vs WELTALL)", () => {
+    const game = createGame();
+    const state = getState(game.gameId);
+    if (!state) throw new Error("State not found");
+
+    state.players.player1.board.push({
+      id: "att-space",
+      name: "Orbital Drone",
+      type: "UNIT",
+      zone: "WELTALL",
+      cost: 2,
+      attack: 2,
+      maxHP: 1
+    });
+
+    state.players.player2.board.push({
+      id: "def-ground",
+      name: "Ground Squad",
+      type: "UNIT",
+      zone: "BODEN",
+      cost: 1,
+      attack: 1,
+      maxHP: 1
+    });
+
+    attack(game.gameId, "player1", "att-space");
+
+    expect(() => declareBlock(game.gameId, "player2", "att-space", "def-ground")).toThrow(
+      "Illegal block"
+    );
   });
 });
