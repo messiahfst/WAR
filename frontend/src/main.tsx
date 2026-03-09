@@ -1018,40 +1018,46 @@ export function App() {
   const menuView = (
     <main className="menu-screen">
       <div className="menu-backdrop" aria-hidden="true" />
-      <section className="menu-card">
-        <img src="/WAR.png" alt="WAR Logo" className="menu-logo" />
-        <h1>WAR</h1>
-        <p className="menu-subtitle">Strategic Card Warfare</p>
+      <section className="menu-grid">
+        <section className="menu-card menu-main-card">
+          <img src="/WAR.png" alt="WAR Logo" className="menu-logo" />
+          <h1>WAR</h1>
+          <p className="menu-subtitle">Strategic Card Warfare</p>
 
-        <div className="menu-actions">
-          <button className="primary large" onClick={startFromMenu} disabled={busy}>
-            Neues Spiel
-          </button>
-          {state ? (
-            <button onClick={() => setScreen("game")} disabled={busy}>
-              Spiel fortsetzen
+          <div className="menu-actions">
+            <button className="primary large" onClick={startFromMenu} disabled={busy}>
+              Neues Spiel
             </button>
-          ) : null}
-        </div>
+            {state ? (
+              <button onClick={() => setScreen("game")} disabled={busy}>
+                Spiel fortsetzen
+              </button>
+            ) : null}
+          </div>
+        </section>
 
-        <div className="menu-settings">
-          <p className="section-title">Einstellungen</p>
-          <div className="menu-setting-row">
-            <span>Musik</span>
-            <button onClick={toggleMenuMusic}>{musicEnabled ? "An" : "Aus"}</button>
+        <section className="menu-card menu-settings-card">
+          <p className="section-title">Audio Einstellungen</p>
+          <p className="menu-subtitle">Nur fuer Hauptmenue Musik</p>
+
+          <div className="menu-settings">
+            <div className="menu-setting-row">
+              <span>Musik</span>
+              <button onClick={toggleMenuMusic}>{musicEnabled ? "An" : "Aus"}</button>
+            </div>
+            <div className="menu-setting-row">
+              <span>Lautstärke</span>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={musicVolume}
+                onChange={(e) => setMusicVolume(Number(e.target.value))}
+                disabled={!musicEnabled}
+              />
+            </div>
           </div>
-          <div className="menu-setting-row">
-            <span>Lautstärke</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={musicVolume}
-              onChange={(e) => setMusicVolume(Number(e.target.value))}
-              disabled={!musicEnabled}
-            />
-          </div>
-        </div>
+        </section>
       </section>
     </main>
   );
