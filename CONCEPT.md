@@ -1,6 +1,6 @@
 # WAR - Game Design Document (GDD)
 
-## 🎮 Projekt-Uebersicht
+## 🎮 Projekt-Übersicht
 
 **WAR** ist ein webbasiertes Sammelkartenspiel mit Kriegs-Thematik und vier Kampfebenen auf einem umkämpften Planeten. Zwei Spieler kontrollieren rivalisierende Fraktionen im Kampf um die Vorherrschaft. Das Spiel kombiniert Strategie, Kartensammlung und taktisches Schlachtfeld-Management.
 
