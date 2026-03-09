@@ -2,14 +2,14 @@
 
 ## 🎮 Projekt-Uebersicht
 
-**WAR** ist ein webbasiertes Sammelkartenspiel mit Kriegs-Thematik und vier Kampfebenen auf einem umkaempften Planeten. Zwei Spieler kontrollieren rivalisierende Fraktionen im Kampf um die Vorherrschaft. Das Spiel kombiniert Strategie, Kartensammlung und taktisches Schlachtfeld-Management.
+**WAR** ist ein webbasiertes Sammelkartenspiel mit Kriegs-Thematik und vier Kampfebenen auf einem umkämpften Planeten. Zwei Spieler kontrollieren rivalisierende Fraktionen im Kampf um die Vorherrschaft. Das Spiel kombiniert Strategie, Kartensammlung und taktisches Schlachtfeld-Management.
 
 ---
 
 ## 1. CORE GAME CONCEPTS
 
 ### 1.1 Spielmodus
-- **Format**: 1v1 PvE (spaeter Multiplayer)
+- **Format**: 1v1 PvE (später Multiplayer)
 - **Spieler**: 2 Fraktionen im direkten Konflikt
 - **Gewinnbedingung**: Gegner auf 0 Leben bringen ODER alle gegnerischen Einheiten besiegen
 
@@ -20,7 +20,7 @@ Der Planet ist in **4 Dominion-Ebenen** aufgeteilt, die aufeinander aufbauen:
 ┌─────────────────────────────┐
 │   WELTALL (Space/Orbitale)  │  <- Raumschiffe, Satelliten, Drohnen
 ├─────────────────────────────┤
-│   LUFT (Atmosphere/Aerial)  │  <- Flugzeuge, Helikopter, Voegel
+│   LUFT (Atmosphere/Aerial)  │  <- Flugzeuge, Helikopter, Vögel
 ├─────────────────────────────┤
 │   WASSER (Naval/Aquatic)    │  <- U-Boote, Kriegsschiffe, Kreaturen
 ├─────────────────────────────┤
@@ -30,22 +30,22 @@ Der Planet ist in **4 Dominion-Ebenen** aufgeteilt, die aufeinander aufbauen:
 
 **Besonderheiten:**
 - Jede Ebene hat bis zu 3 Slot-Positionen pro Spieler
-- Einheiten in hoeheren Ebenen koennen Einheiten in tieferen Ebenen schaden
-- Manche Einheiten koennen zwischen Ebenen wechseln
+- Einheiten in höheren Ebenen können Einheiten in tieferen Ebenen schaden
+- Manche Einheiten können zwischen Ebenen wechseln
 
 ---
 
 ## 2. FRAKTIONEN - Kriegsideologien
 
-Das Spiel verfuegt ueber **5 distinkte Fraktionen**, jede mit eigener Philosophie, Kriegsstrategie und Spielweise:
+Das Spiel verfügt über **5 distinkte Fraktionen**, jede mit eigener Philosophie, Kriegsstrategie und Spielweise:
 
 | Fraktion | Philosophie | Strategie | Symbol |
 |----------|---|---|---|
-| **TECHNOKRAT** | Industrielle Ueberlegenheit durch Technologie | Schnelle, aggressive Maschinenkriegsfuehrung mit massiver Feuerkraft. Viele starke Einzeleinheiten. | ⚙️ Rot |
-| **BIOKOMMUNE** | Natuerliche Evolution und organische Adaption | Langsamer Aufbau mit Heilung und Regeneration. Kleine Armeen, die wachsen und sich vermehren. | 🌿 Gruen |
+| **TECHNOKRAT** | Industrielle Überlegenheit durch Technologie | Schnelle, aggressive Maschinenkriegsführung mit massiver Feuerkraft. Viele starke Einzeleinheiten. | ⚙️ Rot |
+| **BIOKOMMUNE** | Natürliche Evolution und organische Adaption | Langsamer Aufbau mit Heilung und Regeneration. Kleine Armeen, die wachsen und sich vermehren. | 🌿 Grün |
 | **SYNDIKAT** | Information und Kontrolle sind Macht | Manipulation des Gegners durch Spionage, Blockade und Kontrolle. Gezielter Gegenschlag statt Frontalangriff. | ⏸️ Blau |
-| **HEGEMONIE** | Ordnung und disziplinaere Struktur | Allianz und gegenseitige Unterstuetzung. Alle Einheiten werden staerker, wenn sie zusammenarbeiten. | ☀️ Weiss |
-| **EXODUS** | Verderben durch Chaos und Opferbereitschaft | Fanatische Ressourcen-Opfer fuer extreme Effekte. Leben als Waehrung. Explosive Kraft aus Verzweiflung. | 💀 Schwarz |
+| **HEGEMONIE** | Ordnung und disziplinäre Struktur | Allianz und gegenseitige Unterstützung. Alle Einheiten werden stärker, wenn sie zusammenarbeiten. | ☀️ Weiss |
+| **EXODUS** | Verderben durch Chaos und Opferbereitschaft | Fanatische Ressourcen-Opfer für extreme Effekte. Leben als Währung. Explosive Kraft aus Verzweiflung. | 💀 Schwarz |
 
 ---
 
@@ -56,28 +56,28 @@ Das Spiel verfuegt ueber **5 distinkte Fraktionen**, jede mit eigener Philosophi
 1. **EINHEIT** (Unit/Creature)
    - Hat Puste (Kraftwert), Panzerung (Leben)
    - Kann attackieren/verteidigen
-   - Optionale Faehigkeiten
+   - Optionale Fähigkeiten
    - Limitierung: Kann nur auf ihrer Ebene spielbar sein
 
 2. **ZAUBER / OPERATIONEN**
    - Einmalige Spezialeffekte mit sofortiger Wirkung
-   - **Schnellzauber**: Koennen jederzeit gespielt werden (auch als Antwort auf gegnerische Aktionen)
+   - **Schnellzauber**: Können jederzeit gespielt werden (auch als Antwort auf gegnerische Aktionen)
    - **Kampfzauber**: Nur in der eigenen Spielphase nutzbar
 
-3. **GEBAEUDE & STRUKTUREN**
+3. **GEBÄUDE & STRUKTUREN**
    - Permanente Karten, die auf dem Schlachtfeld verbleiben
    - Liefern kontinuierliche Effekte oder Boni
-   - Koennen zerstoert werden, haben aber keine Angriffskapazitaet
+   - Können zerstört werden, haben aber keine Angriffskapazität
 
-4. **AUSRUESTUNG / TECHNOLOGIE**
-   - Werden an Kampfeinheiten angelegt, um sie zu verstaerken
-   - Geben zusaetzliche Attribute oder Faehigkeiten
-   - Koennen umgestellt oder entfernt werden
+4. **AUSRÜSTUNG / TECHNOLOGIE**
+   - Werden an Kampfeinheiten angelegt, um sie zu verstärken
+   - Geben zusätzliche Attribute oder Fähigkeiten
+   - Können umgestellt oder entfernt werden
 
-5. **RESSOURCEN-BASEN (Produktionsgebaeude)**
+5. **RESSOURCEN-BASEN (Produktionsgebäude)**
    - Basis-Strukturen, die kontinuierlich Munition und andere Ressourcen generieren
-   - Essenziell fuer jedes Deck
-   - Koennen angegriffen und zerstoert werden
+   - Essenziell für jedes Deck
+   - Können angegriffen und zerstört werden
 
 ### 3.2 Kartenattribute
 
@@ -91,8 +91,8 @@ Das Spiel verfuegt ueber **5 distinkte Fraktionen**, jede mit eigener Philosophi
 │ Puste: X  | Panzerung: Y         │
 │ Zone: Boden/Luft/Wasser/Weltall  │
 │                                  │
-│ [FAEHIGKEITSTEXT]                │
-│ "Flugfaehig. Wenn diese Karte    │
+│ [FÄHIGKEITSTEXT]                 │
+│ "Flugfähig. Wenn diese Karte     │
 │  ins Spiel kommt: Ziehe 1 Karte" │
 │                                  │
 └──────────────────────────────────┘
@@ -102,18 +102,18 @@ Das Spiel verfuegt ueber **5 distinkte Fraktionen**, jede mit eigener Philosophi
 
 ## 4. RESSOURCEN & PRODUKTION
 
-### 4.1 Munition (Primaere Ressource)
+### 4.1 Munition (Primäre Ressource)
 **Produktion & Verbrauch:**
-- Jedes Ressourcen-Basis-Gebaeude produziert automatisch +1 Munition pro Runde
+- Jedes Ressourcen-Basis-Gebäude produziert automatisch +1 Munition pro Runde
 - Munition wird zum Spielen/Aktivieren von Karten verbraucht
 - Zu Rundenanfang: Jede aktive Ressourcen-Basis gibt 1 Munition, maximal 10 pro Spieler
 
 **Fraktionsspezifische Varianten:**
-- Ressourcentypen koennen je Fraktion variieren (Energie, Biomasse, Daten, Glaube, Blut), erfuellen aber denselben Zweck
-- Nicht verwendete Ressourcen werden am Rundenende geloescht
+- Ressourcentypen können je Fraktion variieren (Energie, Biomasse, Daten, Glaube, Blut), erfüllen aber denselben Zweck
+- Nicht verwendete Ressourcen werden am Rundenende gelöscht
 
 ### 4.2 Treibstoff (Spezialressource)
-- Wird fuer bestimmte Strategien und Mobilitaetseffekte gebraucht
+- Wird für bestimmte Strategien und Mobilitätseffekte gebraucht
 
 ### 4.3 Leben (Health/Lebenspunkte)
 - **Start**: 20 Lebenspunkte pro Spieler
@@ -128,24 +128,24 @@ Das Spiel verfuegt ueber **5 distinkte Fraktionen**, jede mit eigener Philosophi
 
 ```
 PHASE 1: PRODUKTIONSPHASE
-├─ Munition produzieren (Gebaeude-Effekte)
+├─ Munition produzieren (Gebäude-Effekte)
 ├─ Ressourcen auftanken
-└─ Faehigkeiten mit "Zu Rundenbeginn" aktivieren
+└─ Fähigkeiten mit "Zu Rundenbeginn" aktivieren
 
 PHASE 2: SPIELPHASE
-├─ Karten spielen (Einheiten, Magie, Gebaeude)
-├─ Gebaeude-Effekte aktivieren
-└─ Faehigkeiten mit "waehrend Spielphase" nutzen
+├─ Karten spielen (Einheiten, Magie, Gebäude)
+├─ Gebäude-Effekte aktivieren
+└─ Fähigkeiten mit "während Spielphase" nutzen
 
 PHASE 3: ANGRIFFSPHASE
-├─ Einheiten waehlen, die angreifen
+├─ Einheiten wählen, die angreifen
 ├─ Gegner entscheidet, welche Einheiten blocken
 ├─ Kampf berechnen (Puste vs Panzerung)
 └─ Schaden an Spieler oder Einheiten
 
 PHASE 4: ENTWERTUNGSPHASE
 ├─ Alte Effekte ablaufen
-├─ Zustaende zuruecksetzen
+├─ Zustände zurücksetzen
 └─ Runde endet
 ```
 
@@ -154,11 +154,11 @@ PHASE 4: ENTWERTUNGSPHASE
 **EBENEN-KAMPF:**
 - Einheit der Ebene A attackiert Einheit der Ebene B
 - Nur bestimmte Kombinationen sind erlaubt (Weltall > Luft > Wasser > Boden)
-- Einheiten koennen unter Bedingungen auch direkt dem Spieler Schaden zufuegen
+- Einheiten können unter Bedingungen auch direkt dem Spieler Schaden zufügen
 
 **SPEZIALISIERTE ZONE:**
 - Verschiedene Einheiten sind nur in ihrer Zone spielbar
-- Bestimmte Zauber/Gebaeude sind nur in einzelnen Zonen effizient
+- Bestimmte Zauber/Gebäude sind nur in einzelnen Zonen effizient
 
 ---
 
@@ -180,14 +180,14 @@ PHASE 4: ENTWERTUNGSPHASE
 └─────────────────────────────────┘
 ```
 
-### 6.2 Datenbank-Struktur (Ueberblick)
+### 6.2 Datenbank-Struktur (Überblick)
 
-**Hauptentitaeten:**
-- **Cards**: Kartenkatalog (ID, Name, Kosten, Faehigkeiten, etc.)
+**Hauptentitäten:**
+- **Cards**: Kartenkatalog (ID, Name, Kosten, Fähigkeiten, etc.)
 - **Decks**: Spieler-Decks (Kartenkombinationen)
 - **Games**: Aktive/beendete Spiele (Zustand, Verlauf)
 - **Players**: Spieler-Daten (Stats, Erfolge)
-- **GameState**: Rundenzustand (Haende, Boards, Ressourcen)
+- **GameState**: Rundenzustand (Hände, Boards, Ressourcen)
 
 ### 6.3 Dateitypen
 
@@ -242,7 +242,7 @@ GameState: {
 - [ ] Grundlegende Spielmechaniken
 - [ ] 1 Fraktion (z. B. TECHNOKRAT) mit ca. 20 Karten
 - [ ] Single-Player PvE
-- [ ] Einfache UI fuer Kartenspiel
+- [ ] Einfache UI für Kartenspiel
 - [ ] KI-Gegner (easy)
 - [ ] Speicherung von Spielstatus
 
@@ -310,16 +310,16 @@ WAR/
 └── README.md
 ```
 
-### 8.2 Naechste Schritte (konkret)
+### 8.2 Nächste Schritte (konkret)
 
 1. **Repo-Setup**
    - Backend (Node.js + TypeScript)
    - Frontend (React oder Vue)
-   - Datenbank (SQLite fuer MVP)
+   - Datenbank (SQLite für MVP)
 
 2. **Kartendatenbank**
    - Erste 15 Karten der TECHNOKRAT-Fraktion
-   - Seed-Script fuer die Datenbank
+   - Seed-Script für die Datenbank
 
 3. **Game Engine Basics**
    - GameState-Datenstruktur
@@ -345,14 +345,14 @@ WAR/
 
 ---
 
-## 📝 Fragen fuer Refinement & Design-Entscheidungen
+## 📝 Fragen für Refinement & Design-Entscheidungen
 
 - Startleben: 20 pro Spieler oder unterschiedlich je Modus?
-- Deck-Groesse: 60 Karten (fest) oder flexibel (40-80)?
+- Deck-Größe: 60 Karten (fest) oder flexibel (40-80)?
 - Sollen Fraktionen in der ersten Liga nur einzeln spielbar sein?
 - KI-Gegner: Unterschiedliche Boss-Charaktere pro Fraktion?
-- Monetarisierung spaeter: F2P mit Cosmetics oder Karten-Shop?
+- Monetarisierung später: F2P mit Cosmetics oder Karten-Shop?
 
 ---
 
-**Stand**: Konzept v0.1 | Datum: Maerz 2026
+**Stand**: Konzept v0.1 | Datum: März 2026
