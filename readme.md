@@ -225,7 +225,7 @@ Jede Zone erlaubt eigene taktische Entscheidungen bei Aufstellung, Angriff und B
 
 ---
 
-- Open Source first: keine Markenanleihen, keine abhaengigen IP-Bezuege
+- Open Source first: keine Markenanleihen, keine abhängigen IP-Bezüge
 - Klare Terminologie: Munition, Puste, Panzerung, Ressourcen-Basis
 - Modulares System: Engine, API und UI sauber getrennt
 - MVP-fokussiert: erst spielbarer Kern, dann Ausbau
@@ -241,9 +241,9 @@ Jede Zone erlaubt eigene taktische Entscheidungen bei Aufstellung, Angriff und B
 - Node.js + TypeScript + Express
 
 ### Datenbank
-- SQLite (MVP), spaeter optional PostgreSQL
+- SQLite (MVP), später optional PostgreSQL
 
-### Qualitaet
+### Qualität
 - ESLint + Prettier
 - Unit-Tests (Engine), Integrationstests (API)
 
@@ -259,8 +259,8 @@ npm run dev
 Weitere Root-Skripte:
 
 - `npm run build` - baut Backend und Frontend
-- `npm run test` - fuehrt Backend- und Frontend-Tests aus
-- `npm run lint` - fuehrt Backend- und Frontend-Linting aus
+- `npm run test` - führt Backend- und Frontend-Tests aus
+- `npm run lint` - führt Backend- und Frontend-Linting aus
 
 ---
 

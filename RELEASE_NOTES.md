@@ -12,7 +12,7 @@ This is the **first public release** of WAR - a strategic desktop card combat ga
 1. **Start Game:** Click "Neues Spiel" (New Game)
 2. **Play Cards:** Click cards in your hand to see details, or drag them to matching zones
 3. **Attack:** Select a unit from your board and click "Angriff" (Attack)
-4. **Block:** When attacked, select your defending card to "Block aufloesen" (Resolve Block)
+4. **Block:** When attacked, select your defending card to "Block auflösen" (Resolve Block)
 5. **End Turn:** Click "Zug beenden" (End Turn) to let the AI play
 
 ### Key Game Mechanics

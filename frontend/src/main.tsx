@@ -90,13 +90,13 @@ function canBlockZone(attackerZone: Zone, defenderZone: Zone): boolean {
 }
 
 const CARD_RULES: Record<CardType, string> = {
-  UNIT: "Kaempft auf dem Board. Kann angreifen und geblockt werden.",
+  UNIT: "Kämpft auf dem Board. Kann angreifen und geblockt werden.",
   SPELL: "Einmaleffekt. Wird beim Spielen in den Discard gelegt.",
   BUILDING: "Permanenter Effekt auf dem Board.",
-  TECH: "Upgrade fuer Einheiten (MVP spaeter).",
-  RESOURCE: "Erhoeht die Munitionsproduktion pro Zug.",
+  TECH: "Upgrade für Einheiten (MVP später).",
+  RESOURCE: "Erhöht die Munitionsproduktion pro Zug.",
   INSTANT: "Sofortiger Effekt - wirkt beim Spielen, geht dann ins Discard.",
-  ABILITY: "Faehigkeit - permanenter Effekt solange auf dem Board."
+  ABILITY: "Fähigkeit - permanenter Effekt solange auf dem Board."
 };
 
 // Health Bar Component
@@ -178,7 +178,7 @@ function GameOverModal(props: {
         
         <div className="game-over-stats">
           <div className="stat-row">
-            <span className="stat-label">Zuege gespielt:</span>
+            <span className="stat-label">Züge gespielt:</span>
             <span className="stat-value">{state.turn}</span>
           </div>
           <div className="stat-row">
@@ -504,6 +504,10 @@ function CardTile(props: {
   const isAttacked = card.hasAttackedThisRound && card.type === "UNIT" && location === "board";
   const hasSummoningSickness = card.type === "UNIT" && location === "board" && card.summoningSickness;
   const showHealthBar = location === "board" && card.type === "UNIT" && card.maxHP;
+  const showAttackControl = location === "board" && card.type === "UNIT" && owner === "player1" && Boolean(onAttackClick);
+  const attackEnabled = Boolean(canAttack);
+  const showCompactBoardHealth = showHealthBar && !showAttackControl;
+  const boardStats = `${card.attack ? `ATK ${card.attack}` : ""}${card.attack && card.maxHP ? " | " : ""}${card.maxHP ? `HP ${card.currentHP ?? card.maxHP}/${card.maxHP}` : ""}`;
   
   return (
     <article
@@ -515,9 +519,13 @@ function CardTile(props: {
     >
       <span className="name">{card.name}</span>
       <span className="meta">{card.type} | {card.zone}</span>
-      <span className="meta">Kosten {card.cost}{card.attack ? ` | ATK ${card.attack}` : ""}{card.maxHP ? ` | HP ${card.currentHP ?? card.maxHP}/${card.maxHP}` : ""}</span>
+      {location === "hand" ? (
+        <span className="meta">Kosten {card.cost}{card.attack ? ` | ATK ${card.attack}` : ""}{card.maxHP ? ` | HP ${card.currentHP ?? card.maxHP}/${card.maxHP}` : ""}</span>
+      ) : (
+        <span className="meta">Kosten {card.cost}{boardStats ? ` | ${boardStats}` : ""}</span>
+      )}
       
-      {showHealthBar && (
+      {showCompactBoardHealth && (
         <div style={{ marginTop: "0.4rem", display: "flex", flexDirection: "column", gap: "0.2rem" }}>
           <div style={{ fontSize: "0.65rem", color: "#93a3c4", textTransform: "uppercase" }}>HP</div>
           <div style={{ width: "100%", height: "8px", background: "rgba(0, 0, 0, 0.4)", borderRadius: "4px", overflow: "hidden", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
@@ -533,15 +541,19 @@ function CardTile(props: {
         </div>
       )}
       
-      {canAttack && onAttackClick && (
+      {showAttackControl && onAttackClick && (
         <button 
           className="card-action-btn attack-btn" 
+          disabled={!attackEnabled}
           onClick={(e) => {
             e.stopPropagation();
+            if (!attackEnabled) {
+              return;
+            }
             onAttackClick(card.id);
           }}
         >
-          ⚔️ Angreifen
+          {attackEnabled ? "⚔️ Angreifen" : "Nicht bereit"}
         </button>
       )}
       
@@ -959,7 +971,7 @@ export function App() {
       }
 
       setState(res);
-      addLog(`Block aufgeloest: ${defName} blockt ${atkName}.`);
+      addLog(`Block aufgelöst: ${defName} blockt ${atkName}.`);
       await showTrail(`p1:${selectedAttackerId}`, `p2:${selectedDefenderId}`, "BLOCK", `BLOCK: ${defName} x ${atkName}`);
       await flashCard(selectedAttackerId);
       await flashCard(selectedDefenderId);
@@ -1020,7 +1032,7 @@ export function App() {
 
     if (playable) {
       setAiFocusCardId(playable.id);
-      addLog(`AI waehlt ${playable.name}.`);
+      addLog(`AI wählt ${playable.name}.`);
       await delay(420);
       const played = await api.play(gameId, "player2", playable.id);
       if (!isError(played)) {
@@ -1094,7 +1106,7 @@ export function App() {
     }
 
     if (card.zone !== zone) {
-      addLog(`Zone-Fehler: ${card.name} gehoert in ${card.zone}, nicht ${zone}.`);
+      addLog(`Zone-Fehler: ${card.name} gehört in ${card.zone}, nicht ${zone}.`);
       return;
     }
 
@@ -1105,7 +1117,7 @@ export function App() {
     <section className="desktop-only-warning">
       <div>
         <h2>Desktop-Ansicht erforderlich</h2>
-        <p>WAR ist aktuell fuer Maus und Tastatur auf PC-Browser ausgelegt.</p>
+        <p>WAR ist aktuell für Maus und Tastatur auf PC-Browser ausgelegt.</p>
       </div>
     </section>
   );
@@ -1146,7 +1158,7 @@ export function App() {
 
         <section className="menu-card menu-settings-card">
           <p className="section-title">Audio Einstellungen</p>
-          <p className="menu-subtitle">Nur fuer Hauptmenue Musik</p>
+          <p className="menu-subtitle">Nur für Hauptmenü Musik</p>
 
           <div className="menu-settings">
             <div className="menu-setting-row">
@@ -1274,6 +1286,7 @@ export function App() {
                 <h3 className="side-title">Du</h3>
                 {ZONES.map((zone) => {
                   const canAttackThisZone = selectedAttacker ? ATTACK_MAP[selectedAttacker.zone].includes(zone) : false;
+                  const playerCardsInZone = cardsInZone(player?.board, zone);
                   return (
                     <section key={`player-${zone}`} className={`zone-column ${selectedAttacker ? (canAttackThisZone ? "attackable" : "blocked") : ""} ${isDragging ? "drag-active" : ""}`}>
                       <header className="zone-header">
@@ -1281,7 +1294,8 @@ export function App() {
                         <span className="zone-hint-small">{ZONE_HINT[zone]}</span>
                       </header>
                       <div
-                        className={`drop-zone ${dragZone === zone ? "hot" : ""}`}
+                        className={`cards-area player-area drop-target ${dragZone === zone ? "hot" : ""} ${playerCardsInZone.length === 0 ? "empty" : ""}`}
+                        data-empty-label={`Drop in ${zone}`}
                         onDragOver={(e) => {
                           e.preventDefault();
                           setDragZone(zone);
@@ -1292,10 +1306,7 @@ export function App() {
                         }}
                         onDrop={(ev) => onDropZone(ev, zone)}
                       >
-                        {zone}
-                      </div>
-                      <div className="cards-area player-area">
-                        {cardsInZone(player?.board, zone).map((card) => {
+                        {playerCardsInZone.map((card) => {
                           const canAttack = card.type === "UNIT" && !card.hasAttackedThisRound && !card.summoningSickness && isMyTurn && !busy && !state?.isGameOver;
                           return (
                             <CardTile
@@ -1358,7 +1369,7 @@ export function App() {
             </section>
 
             <section className="panel">
-              <p className="section-title">Ausgewaehlte Karte</p>
+              <p className="section-title">Ausgewählte Karte</p>
               {selectedCard ? (
                 <div>
                   <p><strong>{selectedCard.name}</strong></p>
@@ -1372,11 +1383,11 @@ export function App() {
                   <p className="card-rules">{CARD_RULES[selectedCard.type]}</p>
                   <div className="actions" style={{ marginTop: "0.8rem" }}>
                     <button className="primary" onClick={() => playCard(selectedCard.id, "button")} disabled={!state || !isMyTurn || busy || state.isGameOver}>Ausspielen</button>
-                    <button onClick={() => setSelectedCardId(null)}>Abwaehlen</button>
+                    <button onClick={() => setSelectedCardId(null)}>Abwählen</button>
                   </div>
                 </div>
               ) : (
-                <p style={{ color: "var(--muted)" }}>Waehle eine Handkarte fuer Details und Aktion.</p>
+                <p style={{ color: "var(--muted)" }}>Wähle eine Handkarte für Details und Aktion.</p>
               )}
             </section>
 
